@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE — Global resets, typography scale, accessibility
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: var(--font-size-base);
+    letter-spacing: -0.006em;
+    font-weight: 400;
+  }
+
+  /* Typography Scale — Clear hierarchy, readable sizes */
+
+  h1 {
+    @apply text-2xl font-semibold text-foreground;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    @apply text-xl font-semibold text-foreground;
+    letter-spacing: -0.015em;
+  }
+
+  h3 {
+    @apply text-lg font-medium text-foreground;
+    letter-spacing: -0.01em;
+  }
+
+  h4 {
+    @apply text-base font-medium text-foreground;
+  }
+
+  h5 {
+    @apply text-sm font-medium text-foreground;
+    letter-spacing: -0.005em;
+  }
+
+  h6 {
+    @apply text-xs font-medium text-muted-foreground uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ─── Semantic Typography Utilities ─────────────────────────────────────── */
+
+@layer components {
+  /* Display — hero numbers, large callouts */
+  .text-display {
+    @apply text-3xl font-semibold text-foreground;
+    letter-spacing: -0.025em;
+  }
+
+  /* Page title — equivalent to h1 */
+  .text-title {
+    @apply text-2xl font-semibold text-foreground;
+    letter-spacing: -0.02em;
+  }
+
+  /* Section heading — equiv to h2 */
+  .text-heading {
+    @apply text-xl font-semibold text-foreground;
+    letter-spacing: -0.015em;
+  }
+
+  /* Sub-section — equiv to h3 */
+  .text-subheading {
+    @apply text-lg font-medium text-foreground;
+    letter-spacing: -0.01em;
+  }
+
+  /* Body text — default prose */
+  .text-body {
+    @apply text-sm text-foreground;
+    line-height: 1.55;
+  }
+
+  /* Supporting text, descriptions */
+  .text-body-muted {
+    @apply text-sm text-muted-foreground;
+    line-height: 1.55;
+  }
+
+  /* Small supporting text */
+  .text-caption {
+    @apply text-xs text-muted-foreground;
+    letter-spacing: 0.01em;
+  }
+
+  /* Form labels, table headers */
+  .text-label {
+    @apply text-xs font-medium text-muted-foreground uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Monospaced IDs, codes, numbers */
+  .text-mono {
+    @apply font-mono text-sm tabular-nums text-foreground;
+  }
+}
+
+/* Focus-Visible — Accessibility */
+
+*:focus-visible {
+  outline: 2px solid hsl(152 56% 40%);
+  outline-offset: 2px;
+}
+
+.dark *:focus-visible {
+  outline-color: hsl(152 50% 48%);
+}
+
+/* Touch targets */
+@media (pointer: coarse) {
+  button:not([class*="w-"]),
+  a:not([class*="w-"]),
+  [role="button"]:not([class*="w-"]) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

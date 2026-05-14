@@ -1,0 +1,19 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROOT STYLESHEET
+   Split into logical partials — max 300 lines each.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
+@import "./styles/effects.css";
+@import "./styles/animations.css";
+@import "./styles/overrides.css";
+@import "./styles/print.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

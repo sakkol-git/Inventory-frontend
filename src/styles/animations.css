@@ -1,0 +1,315 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS — Micro-interactions, scroll reveal, page transitions,
+   skeleton loading, progress bars, FAB, tooltips
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Micro-interactions ─────────────────────────────────────────────────── */
+
+/* Hover lift — Cards that lift on hover */
+.hover-lift {
+  transition:
+    transform 200ms cubic-bezier(0.25, 1, 0.5, 1),
+    box-shadow 200ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* Press effect — Scale down on active */
+.press-effect:active {
+  transform: scale(0.97);
+  transition: transform 80ms ease;
+}
+
+/* Smooth grow */
+.hover-grow {
+  transition: transform 200ms ease;
+}
+
+.hover-grow:hover {
+  transform: scale(1.02);
+}
+
+/* Glow effect on hover */
+.hover-glow:hover {
+  box-shadow: 0 0 20px 2px hsl(152 65% 38% / 0.2);
+}
+
+.dark .hover-glow:hover {
+  box-shadow: 0 0 20px 2px hsl(152 50% 48% / 0.15);
+}
+
+/* Shine effect — sweeping highlight */
+.shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-effect::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: left 0.5s ease;
+}
+
+.shine-effect:hover::after {
+  left: 120%;
+}
+
+/* Button ripple */
+.ripple-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-button::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    hsl(0 0% 100% / 0.25) 10%,
+    transparent 10.01%
+  );
+  background-repeat: no-repeat;
+  background-position: 50%;
+  transform: scale(10, 10);
+  opacity: 0;
+  transition:
+    transform 0.4s,
+    opacity 0.6s;
+}
+
+.ripple-button:active::after {
+  transform: scale(0, 0);
+  opacity: 0.4;
+  transition: 0s;
+}
+
+/* ─── Scroll Reveal ──────────────────────────────────────────────────────── */
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.scroll-reveal {
+  animation: reveal-up 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.scroll-reveal-scale {
+  animation: reveal-scale 0.4s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.scroll-reveal-left {
+  animation: reveal-left 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.scroll-reveal-right {
+  animation: reveal-right 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Staggered reveal for child items */
+.stagger-children > * {
+  opacity: 0;
+  animation: reveal-up 0.4s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.stagger-children > *:nth-child(6) {
+  animation-delay: 250ms;
+}
+.stagger-children > *:nth-child(7) {
+  animation-delay: 300ms;
+}
+.stagger-children > *:nth-child(8) {
+  animation-delay: 350ms;
+}
+
+/* ─── Page Transitions ───────────────────────────────────────────────────── */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: page-enter 0.3s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* ─── Skeleton Loading ───────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.08) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* ─── Gradient Progress Bars ─────────────────────────────────────────────── */
+
+.gradient-progress-bar {
+  background: linear-gradient(
+    90deg,
+    hsl(152 65% 45%),
+    hsl(152 65% 38%),
+    hsl(160 70% 30%)
+  );
+  background-size: 200% 100%;
+  animation: gradient-shift 2s ease infinite;
+  border-radius: 9999px;
+  height: 100%;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ─── Floating Action Button ─────────────────────────────────────────────── */
+
+@keyframes fab-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fab-enter {
+  animation: fab-in 0.25s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Pulse animation for notification badges */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.pulse-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: hsl(var(--destructive));
+  animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* ─── Tooltip Animations ─────────────────────────────────────────────────── */
+
+.tooltip-bounce {
+  animation: tooltip-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes tooltip-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

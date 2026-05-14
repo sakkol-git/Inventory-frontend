@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   OVERRIDES — Dark mode specifics + reduced motion accessibility
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Dark Mode Specific Overrides ───────────────────────────────────────── */
+
+.dark .status-seedling,
+.dark .status-growing {
+  background-color: hsl(152 30% 15%);
+  color: hsl(152 60% 65%);
+}
+
+.dark .status-harvested {
+  background-color: hsl(38 30% 15%);
+  color: hsl(38 80% 65%);
+}
+
+.dark .status-failed {
+  background-color: hsl(0 30% 15%);
+  color: hsl(0 70% 65%);
+}
+
+.dark .status-seed {
+  background-color: hsl(220 14% 14%);
+  color: hsl(220 10% 70%);
+}
+
+/* ─── Reduced Motion — Respect user preferences (WCAG 2.3.3) ────────────── */
+/*   Users who enable "reduce motion" in their OS settings should not see
+     entrance animations, parallax, or auto-playing motion. Functional
+     transitions (progress bars, loading spinners) are preserved.            */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Preserve functional indicators */
+  .skeleton,
+  .gradient-progress-bar,
+  [role="progressbar"] * {
+    animation-duration: 1.5s !important;
+    animation-iteration-count: infinite !important;
+  }
+}

@@ -1,0 +1,348 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENTS — Reusable utility classes for cards, tables, badges, etc.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* Utility classes */
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .clickable-row {
+    transition: all var(--transition-duration) var(--transition-snap);
+  }
+
+  .clickable-row:hover {
+    @apply bg-muted/50;
+  }
+
+  /* Card styles — Visible, elevated */
+
+  .minimal-card {
+    @apply bg-card rounded-lg p-5 border border-border shadow-md;
+    transition:
+      box-shadow var(--transition-duration) var(--transition-snap),
+      border-color var(--transition-duration) var(--transition-snap);
+  }
+
+  .minimal-card:hover {
+    @apply shadow-lg border-border;
+  }
+
+  .minimal-card-bordered {
+    @apply bg-card border border-border rounded-lg p-5 shadow-md;
+  }
+
+  .minimal-card-accent {
+    @apply bg-card border border-border border-l-2 border-l-primary rounded-lg p-5 shadow-md;
+  }
+
+  /* Status Pills — Dot + text, or ultra-subtle pill */
+
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-normal rounded-full bg-muted text-muted-foreground;
+  }
+
+  .status-seed {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  .status-seedling {
+    @apply bg-emerald-50 text-emerald-600;
+  }
+
+  .status-growing {
+    @apply bg-emerald-50 text-emerald-600;
+  }
+
+  .status-harvested {
+    @apply bg-amber-50 text-amber-600;
+  }
+
+  .status-failed {
+    @apply bg-red-50 text-red-600;
+  }
+
+  /* Hazard Indicators — Subtle left accent */
+
+  .hazard-high {
+    @apply border-l-2 border-l-destructive;
+  }
+
+  .hazard-medium {
+    @apply border-l-2 border-l-warning;
+  }
+
+  .hazard-low {
+    @apply border-l-2 border-l-primary;
+  }
+
+  /* Data Tables — Readable with visible structure */
+
+  .data-table {
+    @apply w-full overflow-hidden;
+  }
+
+  .data-table thead {
+    @apply border-b border-border bg-muted/50;
+  }
+
+  .data-table th {
+    @apply px-4 py-3 text-left text-sm font-medium text-muted-foreground;
+  }
+
+  .data-table td {
+    @apply px-4 py-3 text-sm;
+  }
+
+  .data-table tbody tr {
+    @apply transition-colors border-b border-border/50;
+  }
+
+  .data-table tbody tr:last-child {
+    @apply border-b-0;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-muted/50;
+  }
+
+  /* Icon Containers — Clear, visible */
+
+  .icon-badge {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg bg-muted text-muted-foreground;
+  }
+
+  .icon-badge-primary {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 text-primary;
+  }
+
+  .icon-badge-destructive {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg bg-destructive/10 text-destructive;
+  }
+
+  .icon-badge-warning {
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10 text-amber-600;
+  }
+
+  /* Progress Bars — Visible */
+
+  .minimal-progress {
+    @apply h-2.5 bg-muted rounded-full overflow-hidden;
+  }
+
+  .minimal-progress-bar {
+    @apply h-full bg-primary rounded-full transition-all duration-500;
+  }
+
+  /* Inputs — Visible borders, readable text */
+
+  .minimal-input {
+    @apply w-full px-3 py-2.5 bg-card border border-border text-sm rounded-lg;
+    @apply focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply placeholder:text-muted-foreground;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  /* Activity Indicator — Simple dots */
+
+  .activity-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .activity-dot-primary {
+    @apply bg-primary;
+  }
+
+  .activity-dot-warning {
+    @apply bg-warning;
+  }
+
+  .activity-dot-destructive {
+    @apply bg-destructive;
+  }
+
+  .activity-dot-muted {
+    @apply bg-muted-foreground/20;
+  }
+
+  /* Section Headers — Minimal */
+
+  .section-header {
+    @apply flex items-center gap-2 pb-3 mb-4;
+  }
+
+  .section-title {
+    @apply text-sm font-medium text-foreground;
+  }
+
+  /* Badges — Ultra-light */
+
+  .minimal-badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-normal rounded-full;
+  }
+
+  .minimal-badge-primary {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .minimal-badge-destructive {
+    @apply bg-destructive/10 text-destructive;
+  }
+
+  .minimal-badge-warning {
+    @apply bg-amber-500/10 text-amber-700;
+  }
+
+  .minimal-badge-muted {
+    @apply bg-muted text-muted-foreground;
+  }
+
+  /* Empty State */
+
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+
+  .empty-state-icon {
+    @apply mb-4 p-4 bg-muted rounded-xl;
+  }
+
+  .empty-state-title {
+    @apply text-base font-medium text-foreground mb-1;
+  }
+
+  .empty-state-description {
+    @apply text-sm text-muted-foreground max-w-sm;
+  }
+
+  /* Skip Link — Accessibility */
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100]
+           focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground
+           focus:font-medium focus:rounded-lg;
+  }
+
+  /* Breadcrumb */
+
+  .breadcrumb {
+    @apply flex items-center gap-1.5 text-sm;
+  }
+
+  .breadcrumb-item {
+    @apply text-muted-foreground hover:text-foreground transition-colors;
+  }
+
+  .breadcrumb-separator {
+    @apply text-muted-foreground select-none;
+  }
+
+  .breadcrumb-current {
+    @apply text-foreground font-medium;
+  }
+
+  /* ─── Page & Layout ──────────────────────────────────────────────── */
+
+  /* Standard page content wrapper — use instead of bare space-y-6 */
+  .page-content {
+    @apply space-y-6 animate-fade-in;
+  }
+
+  /* ─── Filter Toolbar — search + filters + view toggle row ───────── */
+
+  .filter-toolbar {
+    @apply flex flex-col sm:flex-row items-start sm:items-center gap-3;
+  }
+
+  .filter-toolbar-end {
+    @apply flex items-center gap-2 flex-wrap;
+  }
+
+  /* ─── View Toggle Group — bg container for grid/list toggle ─────── */
+
+  .view-toggle-group {
+    @apply flex gap-1 rounded-lg p-1 bg-muted;
+  }
+
+  /* ─── Forms ──────────────────────────────────────────────────────── */
+
+  /* Canonical form field — label · input · error */
+  .form-field {
+    @apply flex flex-col gap-1.5;
+  }
+
+  /* Two-column responsive form grid */
+  .form-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+  }
+
+  /* Three-column responsive form grid */
+  .form-grid-3 {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-4;
+  }
+
+  /* ─── Dialog Sections — grouped blocks inside a dialog ──────────── */
+
+  .dialog-section {
+    @apply space-y-4;
+  }
+
+  .dialog-section + .dialog-section {
+    @apply pt-5 border-t border-border/60;
+  }
+
+  /* Section title row with icon */
+  .dialog-section-title {
+    @apply flex items-center gap-2 text-sm font-medium text-foreground mb-3;
+  }
+
+  .dialog-section-icon {
+    @apply inline-flex items-center justify-center w-7 h-7 rounded-md
+           bg-primary/10 text-primary shrink-0;
+  }
+
+  /* ─── Status Tags — inline semantic badges ───────────────────────── */
+
+  .status-tag {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium
+           rounded-md border;
+  }
+
+  .status-tag-success {
+    @apply bg-success/10 text-success border-success/20;
+  }
+
+  .status-tag-warning {
+    @apply bg-warning/10 text-warning border-warning/20;
+  }
+
+  .status-tag-error {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
+  }
+
+  .status-tag-info {
+    @apply bg-info/10 text-info border-info/20;
+  }
+
+  .status-tag-muted {
+    @apply bg-muted text-muted-foreground border-border/40;
+  }
+
+  /* ─── Stat Card — used in QuickStats, dashboard numbers ─────────── */
+
+  .stat-card {
+    @apply rounded-xl border p-4 text-center;
+  }
+
+  .stat-value {
+    @apply text-2xl font-semibold tabular-nums;
+  }
+
+  .stat-label {
+    @apply text-xs text-muted-foreground mt-0.5;
+  }
+}

@@ -1,0 +1,175 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRINT STYLES — Phase 19.1
+   
+   Optimized for clean, readable printed output:
+   - Hide navigation chrome (sidebar, topnav, mobile nav)
+   - Hide interactive elements (buttons, filters, pagination)
+   - Expand content to full width
+   - Clean typography for print
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  /* ─── Hide navigation and interactive elements ───────────────── */
+
+  nav,
+  [data-sidebar],
+  [data-topnav],
+  [data-mobile-nav],
+  .skip-link,
+  button:not([data-print]),
+  [role="toolbar"],
+  .filter-toolbar,
+  .view-toggle-group,
+  .command-palette,
+  .keyboard-shortcuts-panel,
+  [data-radix-popper-content-wrapper],
+  footer {
+    display: none !important;
+  }
+
+  /* ─── Reset layout ───────────────────────────────────────────── */
+
+  body {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000 !important;
+    background: #fff !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* ─── Cards and containers ───────────────────────────────────── */
+
+  .minimal-card,
+  .minimal-card-bordered,
+  .minimal-card-accent,
+  .stat-card,
+  [class*="rounded-xl border"] {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ─── Tables ─────────────────────────────────────────────────── */
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid #999;
+    padding: 4pt 8pt;
+    text-align: left;
+    font-size: 10pt;
+  }
+
+  th {
+    background: #f0f0f0 !important;
+    font-weight: 600;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* ─── Typography adjustments ─────────────────────────────────── */
+
+  h1 {
+    font-size: 18pt;
+  }
+  h2 {
+    font-size: 16pt;
+  }
+  h3 {
+    font-size: 14pt;
+  }
+  h4 {
+    font-size: 12pt;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #666;
+  }
+
+  /* Don't show URLs for internal links */
+  a[href^="/"]::after,
+  a[href^="#"]::after {
+    content: "";
+  }
+
+  /* ─── Images and charts ──────────────────────────────────────── */
+
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  .recharts-wrapper {
+    page-break-inside: avoid;
+  }
+
+  /* ─── Status badges — ensure visible in B&W ─────────────────── */
+
+  .status-tag,
+  .minimal-badge,
+  .status-pill {
+    border: 1px solid #999 !important;
+    background: #f5f5f5 !important;
+    color: #000 !important;
+  }
+
+  /* ─── Page header/footer ─────────────────────────────────────── */
+
+  @page {
+    margin: 1.5cm;
+
+    @top-center {
+      content: "Plant Lab Inventory";
+      font-size: 9pt;
+      color: #999;
+    }
+
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 9pt;
+      color: #999;
+    }
+
+    @bottom-left {
+      content: "Printed " attr(data-print-date);
+      font-size: 9pt;
+      color: #999;
+    }
+  }
+
+  /* ─── Page breaks ────────────────────────────────────────────── */
+
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+
+  .page-break-before {
+    page-break-before: always;
+  }
+}
