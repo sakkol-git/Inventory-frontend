@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Pencil, type LucideIcon } from "lucide-react";
+import { Pencil, Trash2, type LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 export interface ProductCardMeta {
@@ -27,7 +27,9 @@ export interface ProductCardProps {
   tags?: string[];
   /** Edit handler */
   onEdit?: () => void;
-  /** Click handler for card */
+  /** Delete handler - receives title for aria-label */
+  onDelete?: (title: string) => void;
+  /** Click handler for entire card */
   onClick?: () => void;
   /** Custom className */
   className?: string;
@@ -55,6 +57,7 @@ export const ProductCard = ({
   meta = [],
   tags = [],
   onEdit,
+  onDelete,
   onClick,
   className,
   imageBackgroundColor = "bg-muted/30",
@@ -169,6 +172,20 @@ export const ProductCard = ({
               aria-label="Edit"
             >
               <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-9 w-9 p-0 shrink-0 text-destructive hover:text-destructive"
+              aria-label={`Delete ${title}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(title);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>

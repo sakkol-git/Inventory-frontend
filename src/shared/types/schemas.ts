@@ -293,7 +293,7 @@ export type ReturnBorrowPayload = z.infer<typeof returnBorrowSchema>;
 
 // ── Achievement ───────────────────────────────────────────────────────────
 export const storeAchievementSchema = z.object({
-  name: z.string().min(1, "Name is required").max(255),
+  achievement_name: z.string().min(1, "Name is required").max(255),
   description: z.string().nullable().optional(),
   criteria_type: z.string().min(1, "Criteria type is required").max(100),
   criteria_value: z.number().int().min(1),

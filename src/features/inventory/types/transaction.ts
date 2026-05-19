@@ -14,6 +14,6 @@ export interface TransactionApi {
     type: string;
     id: number;
     data: unknown;
-  };
+  } | null;
   created_at: string;
 }

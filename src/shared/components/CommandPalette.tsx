@@ -168,7 +168,7 @@ const CommandPalette = () => {
     {
       label: "Users",
       icon: Users,
-      action: () => go("/inventory/users"),
+      action: () => go("/admin/users"),
       keywords: "team members",
     },
   ];

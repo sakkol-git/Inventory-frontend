@@ -3,7 +3,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import type { LabLocation, SampleStatus } from "@/shared/types/enums";
-import type { PlantSpeciesApi } from "./plant-species";
 import type { PlantVarietyApi } from "./plant-variety";
 
 export interface PlantSampleApi {
@@ -14,7 +13,6 @@ export interface PlantSampleApi {
     status: SampleStatus;
   };
   relationships: {
-    species: PlantSpeciesApi | null;
     variety: PlantVarietyApi | null;
   };
   details: {
@@ -38,7 +36,7 @@ export interface PlantSampleApi {
 export interface PlantSamplePayload {
   sample_name: string;
   sample_code: string;
-  plant_species_id: number;
+  plant_species_id?: number;
   plant_variety_id?: number | null;
   owner_name?: string | null;
   department?: string | null;

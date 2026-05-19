@@ -60,11 +60,37 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      if ("serviceWorker" in navigator) {
+      (async () => {
+        if (!("serviceWorker" in navigator)) return;
+
+        const isLocalDev =
+          location.hostname === "localhost" ||
+          location.hostname === "127.0.0.1" ||
+          location.hostname === "::1" ||
+          location.port === "8081";
+
+        if (isLocalDev) {
+          try {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(
+              registrations.map((registration) => registration.unregister()),
+            );
+
+            if ("caches" in window) {
+              const cacheNames = await caches.keys();
+              await Promise.all(cacheNames.map((name) => caches.delete(name)));
+            }
+          } catch {
+            // Ignore cleanup failures in local development.
+          }
+
+          return;
+        }
+
         window.addEventListener("load", () => {
           navigator.serviceWorker.register("/sw.js").catch(() => {});
         });
-      }
+      })();
     </script>
   </body>
 </html>

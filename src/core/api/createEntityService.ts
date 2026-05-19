@@ -105,9 +105,10 @@ export function createEntityService<TApi, TPayload>(
     create: (payload) => {
       const raw = payload as unknown as Record<string, unknown>;
       if (hasFile(raw)) {
-        // Let axios set the multipart boundary automatically — never hard-code Content-Type.
         return api
-          .post<{ data: TApi }>(endpoint, toFormData(raw))
+          .post<{ data: TApi }>(endpoint, toFormData(raw), {
+            headers: { "Content-Type": "multipart/form-data" },
+          })
           .then((r) => r.data);
       }
       return api
@@ -118,9 +119,10 @@ export function createEntityService<TApi, TPayload>(
     update: (id, payload) => {
       const raw = payload as unknown as Record<string, unknown>;
       if (hasFile(raw)) {
-        // Laravel doesn't parse PUT multipart; POST + _method=PUT is the standard workaround.
         return api
-          .post<{ data: TApi }>(`${endpoint}/${id}`, toFormData(raw, "PUT"))
+          .post<{ data: TApi }>(`${endpoint}/${id}`, toFormData(raw, "PUT"), {
+            headers: { "Content-Type": "multipart/form-data" },
+          })
           .then((r) => r.data);
       }
       return api

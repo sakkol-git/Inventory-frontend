@@ -38,88 +38,88 @@ const ActivityLog = lazyRoute(
 
 // ─── Inventory: Listings ─────────────────────────────────────────────────────
 const Dashboard = lazyRoute(
-  () => import("@/features/inventory/pages/Dashboard"),
+  () => import("@/features/inventory/pages/dashboard/Dashboard"),
   { displayName: "Dashboard" },
 );
 const PlantSpecies = lazyRoute(
-  () => import("@/features/inventory/pages/PlantSpecies"),
+  () => import("@/features/inventory/pages/plant-species/PlantSpecies"),
   { displayName: "PlantSpecies" },
 );
 const PlantStock = lazyRoute(
-  () => import("@/features/inventory/pages/PlantStock"),
+  () => import("@/features/inventory/pages/plant-stock/PlantStock"),
   { displayName: "PlantStock" },
 );
 const PlantVarieties = lazyRoute(
-  () => import("@/features/inventory/pages/PlantVarieties"),
+  () => import("@/features/inventory/pages/plant-variety/PlantVarieties"),
   { displayName: "PlantVarieties" },
 );
 const PlantSamples = lazyRoute(
-  () => import("@/features/inventory/pages/PlantSamples"),
+  () => import("@/features/inventory/pages/plant-sample/PlantSamples"),
   { displayName: "PlantSamples" },
 );
 const Chemicals = lazyRoute(
-  () => import("@/features/inventory/pages/Chemicals"),
+  () => import("@/features/inventory/pages/chemical/Chemicals"),
   { displayName: "Chemicals" },
 );
 const Equipment = lazyRoute(
-  () => import("@/features/inventory/pages/Equipment"),
+  () => import("@/features/inventory/pages/equipment/Equipment"),
   { displayName: "Equipment" },
 );
 const ChemicalBatches = lazyRoute(
-  () => import("@/features/inventory/pages/ChemicalBatches"),
+  () => import("@/features/inventory/pages/chemical/ChemicalBatches"),
   { displayName: "ChemicalBatches" },
 );
 const Transactions = lazyRoute(
-  () => import("@/features/inventory/pages/Transactions"),
+  () => import("@/features/inventory/pages/transaction/Transactions"),
   { displayName: "Transactions" },
 );
 const BorrowRecords = lazyRoute(
-  () => import("@/features/inventory/pages/BorrowRecords"),
+  () => import("@/features/inventory/pages/borrow-record/BorrowRecords"),
   { displayName: "BorrowRecords" },
 );
 const MaintenanceRecords = lazyRoute(
-  () => import("@/features/inventory/pages/MaintenanceRecords"),
+  () => import("@/features/inventory/pages/equipment/MaintenanceRecords"),
   { displayName: "MaintenanceRecords" },
 );
 const Achievements = lazyRoute(
-  () => import("@/features/inventory/pages/Achievements"),
+  () => import("@/features/inventory/pages/Achievments/Achievements"),
   { displayName: "Achievements" },
 );
 const UserDocuments = lazyRoute(
-  () => import("@/features/inventory/pages/UserDocuments"),
+  () => import("@/features/inventory/pages/user/UserDocuments"),
   { displayName: "UserDocuments" },
 );
-const Users = lazyRoute(() => import("@/features/inventory/pages/Users"), {
+const Users = lazyRoute(() => import("@/features/admin/pages/Users"), {
   displayName: "Users",
 });
 const UserProfile = lazyRoute(
-  () => import("@/features/inventory/pages/UserProfile"),
+  () => import("@/features/inventory/pages/user/UserProfile"),
   { displayName: "UserProfile" },
 );
 
 // ─── Inventory: Details ──────────────────────────────────────────────────────
 const PlantSpeciesDetail = lazyRoute(
-  () => import("@/features/inventory/pages/PlantSpeciesDetail"),
+  () => import("@/features/inventory/pages/plant-species/PlantSpeciesDetail"),
   { displayName: "PlantSpeciesDetail" },
 );
 const PlantStockDetail = lazyRoute(
-  () => import("@/features/inventory/pages/PlantStockDetail"),
+  () => import("@/features/inventory/pages/plant-stock/PlantStockDetail"),
   { displayName: "PlantStockDetail" },
 );
 const PlantVarietyDetail = lazyRoute(
-  () => import("@/features/inventory/pages/PlantVarietyDetail"),
+  () => import("@/features/inventory/pages/plant-variety/PlantVarietyDetail"),
   { displayName: "PlantVarietyDetail" },
 );
 const PlantSampleDetail = lazyRoute(
-  () => import("@/features/inventory/pages/PlantSampleDetail"),
+  () => import("@/features/inventory/pages/plant-sample/PlantSampleDetail"),
   { displayName: "PlantSampleDetail" },
 );
 const ChemicalDetail = lazyRoute(
-  () => import("@/features/inventory/pages/ChemicalDetail"),
+  () => import("@/features/inventory/pages/chemical/ChemicalDetail"),
   { displayName: "ChemicalDetail" },
 );
 const EquipmentDetail = lazyRoute(
-  () => import("@/features/inventory/pages/EquipmentDetail"),
+  () => import("@/features/inventory/pages/equipment/EquipmentDetail"),
   { displayName: "EquipmentDetail" },
 );
 
@@ -153,11 +153,17 @@ const UserActivityReportPage = lazyRoute(
 function Protected({
   children,
   permission,
+  requiredRole,
 }: {
   children: React.ReactNode;
   permission?: string;
+  requiredRole?: string;
 }) {
-  return <ProtectedRoute permission={permission}>{children}</ProtectedRoute>;
+  return (
+    <ProtectedRoute permission={permission} requiredRole={requiredRole}>
+      {children}
+    </ProtectedRoute>
+  );
 }
 
 // ─── Route Tree ──────────────────────────────────────────────────────────────
@@ -258,22 +264,22 @@ export default function AppRoutes() {
         path="/inventory/borrow-records/overdue"
         element={<Navigate to="/inventory/borrow-records" replace />}
       />
-      <Route
+      {/* <Route
         path="/inventory/chemical-batches"
         element={
           <Protected permission="chemical_batches.view">
             <ChemicalBatches />
           </Protected>
         }
-      />
-      <Route
+      /> */}
+      {/* <Route
         path="/inventory/maintenance-records"
         element={
           <Protected permission="maintenance.view">
             <MaintenanceRecords />
           </Protected>
         }
-      />
+      /> */}
       <Route
         path="/inventory/achievements"
         element={
@@ -291,9 +297,9 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/inventory/users"
+        path="/admin/users"
         element={
-          <Protected permission="users.view">
+          <Protected requiredRole="admin">
             <Users />
           </Protected>
         }
@@ -461,7 +467,7 @@ export default function AppRoutes() {
       <Route
         path="/admin/roles"
         element={
-          <Protected permission="roles.view">
+          <Protected requiredRole="admin">
             <RoleManagement />
           </Protected>
         }
@@ -469,7 +475,7 @@ export default function AppRoutes() {
       <Route
         path="/admin/permissions"
         element={
-          <Protected permission="permissions.view">
+          <Protected requiredRole="admin">
             <PermissionManagement />
           </Protected>
         }
@@ -477,7 +483,7 @@ export default function AppRoutes() {
       <Route
         path="/admin/activity-log"
         element={
-          <Protected permission="reports.view">
+          <Protected requiredRole="admin">
             <ActivityLog />
           </Protected>
         }
@@ -506,7 +512,7 @@ export default function AppRoutes() {
       />
       <Route
         path="/users"
-        element={<Navigate to="/inventory/users" replace />}
+        element={<Navigate to="/admin/users" replace />}
       />
       <Route
         path="/products/species/:id"

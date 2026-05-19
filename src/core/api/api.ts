@@ -14,11 +14,21 @@ export const saveToken = (t: string) => localStorage.setItem(TOKEN_KEY, t);
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
 
-// Prefer the explicit env var; fall back to the Vite-proxied relative path
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  "/api/v1";
+const normalizeBaseUrl = (baseUrl: string) => baseUrl.replace(/\/$/, "");
+
+// Prefer the deployed backend when provided; otherwise use the Vite proxy path.
+const API_BASE_URL = (() => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  if (backendUrl) {
+    return `${normalizeBaseUrl(backendUrl)}/api/v1`;
+  }
+
+  return (
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    "/api/v1"
+  );
+})();
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

@@ -4,8 +4,6 @@
 
 import type { StockStatus } from "@/shared/types/enums";
 import type { PlantSampleApi } from "./plant-sample";
-import type { PlantSpeciesApi } from "./plant-species";
-import type { PlantVarietyApi } from "./plant-variety";
 
 export interface PlantStockApi {
   id: number;
@@ -16,8 +14,6 @@ export interface PlantStockApi {
     status: StockStatus;
   };
   relations: {
-    species: PlantSpeciesApi | null;
-    variety: PlantVarietyApi | null;
     sample: PlantSampleApi | null;
   };
   created_at: string;
@@ -25,8 +21,6 @@ export interface PlantStockApi {
 }
 
 export interface PlantStockCreatePayload {
-  plant_species_id: number;
-  plant_variety_id?: number | null;
   plant_sample_id?: number | null;
   quantity: number;
   reserved_quantity: number;

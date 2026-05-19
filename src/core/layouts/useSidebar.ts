@@ -103,18 +103,18 @@ const INVENTORY_NAV: NavItem[] = [
       "/inventory/borrow-records/overdue",
     ],
   },
-  {
-    title: "Chemical Batches",
-    url: "/inventory/chemical-batches",
-    icon: FlaskConical,
-    matchPaths: ["/inventory/chemical-batches"],
-  },
-  {
-    title: "Maintenance",
-    url: "/inventory/maintenance-records",
-    icon: Wrench,
-    matchPaths: ["/inventory/maintenance-records"],
-  },
+  // {
+  //   title: "Chemical Batches",
+  //   url: "/inventory/chemical-batches",
+  //   icon: FlaskConical,
+  //   matchPaths: ["/inventory/chemical-batches"],
+  // },
+  // {
+  //   title: "Maintenance",
+  //   url: "/inventory/maintenance-records",
+  //   icon: Wrench,
+  //   matchPaths: ["/inventory/maintenance-records"],
+  // },
   {
     title: "Reports",
     url: "/inventory/reports",
@@ -135,9 +135,9 @@ const INVENTORY_NAV: NavItem[] = [
   },
   {
     title: "Users",
-    url: "/inventory/users",
+    url: "/admin/users",
     icon: Users,
-    matchPaths: ["/inventory/users"],
+    matchPaths: ["/admin/users"],
   },
   {
     title: "Roles",
@@ -193,8 +193,8 @@ const INVENTORY_GROUPS: NavGroup[] = [
       [
         "Transactions",
         "Borrow Records",
-        "Chemical Batches",
-        "Maintenance",
+       // "Chemical Batches",
+        // "Maintenance",
       ].includes(n.title),
     ),
   },
