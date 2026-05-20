@@ -8,8 +8,21 @@
  */
 
 import { ProtectedRoute } from "@/core/auth";
+import { useAuth } from "@/core/auth/useAuth";
 import { lazyRoute } from "@/shared/lib/lazy-routes";
 import { Navigate, Route, Routes } from "react-router-dom";
+
+function BorrowRecordTabRedirect() {
+  const { isLoading, isAuthenticated, isRole } = useAuth();
+
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isRole("admin") && !isRole("lab_manager")) {
+    return <Navigate to="/inventory" replace />;
+  }
+
+  return <Navigate to="/inventory/borrow-records" replace />;
+}
 
 // ─── Public ──────────────────────────────────────────────────────────────────
 const LoginPage = lazyRoute(() => import("@/core/auth/pages/LoginPage"), {
@@ -258,13 +271,11 @@ export default function AppRoutes() {
       />
       <Route
         path="/inventory/borrow-records/pending"
-        element={<Protected permission="borrows.view">
-          <Navigate to="/inventory/borrow-records" replace />
-        </Protected>}
+        element={<BorrowRecordTabRedirect />}
       />
       <Route
         path="/inventory/borrow-records/overdue"
-        element={<Navigate to="/inventory/borrow-records" replace />}
+        element={<BorrowRecordTabRedirect />}
       />
       {/* <Route
         path="/inventory/chemical-batches"

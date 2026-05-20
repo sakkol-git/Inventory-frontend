@@ -15,6 +15,8 @@ import {
     RotateCcw,
     XCircle,
 } from "lucide-react";
+import { useEffect } from "react";
+import { useAuth } from "@/core/auth/useAuth";
 
 // ─── Internal Components ───────────────────────────────────────────────────
 import { Badge } from "@/components/ui/badge";
@@ -77,6 +79,16 @@ const TABS: { id: BorrowTab; label: string; icon: typeof ArrowLeftRight }[] = [
 
 const BorrowRecords = () => {
   const view = useBorrowRecordsView();
+  const { isRole } = useAuth();
+  const { activeTab, setActiveTab } = view;
+  const canViewAdminTabs = isRole("admin") || isRole("lab_manager");
+  const tabs = canViewAdminTabs ? TABS : TABS.filter((tab) => tab.id === "all");
+
+  useEffect(() => {
+    if (!canViewAdminTabs && activeTab !== "all") {
+      setActiveTab("all");
+    }
+  }, [canViewAdminTabs, activeTab, setActiveTab]);
 
   const hasResults = view.items.length > 0;
 
@@ -86,7 +98,11 @@ const BorrowRecords = () => {
         <PageHeader
           icon={ArrowLeftRight}
           title="Borrow Records"
-          description="Track borrowed items, pending approvals, and overdue returns"
+          description={
+            canViewAdminTabs
+              ? "Track borrowed items, pending approvals, and overdue returns"
+              : "Track borrowed items"
+          }
           actions={
             <Button className="gap-2" onClick={view.openBorrowForm}>
               <Plus className="h-4 w-4" />
@@ -97,7 +113,7 @@ const BorrowRecords = () => {
 
         {/* Tab navigation */}
         <div className="flex gap-1 border-b border-border">
-          {TABS.map(({ id, label, icon: Icon }) => (
+          {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => view.setActiveTab(id)}
@@ -315,7 +331,7 @@ const BorrowRow = ({
         variant={
           item.is_overdue
             ? "destructive"
-            : item.status === "approved"
+            : item.status === "borrowed"
               ? "default"
               : item.status === "pending"
                 ? "secondary"
