@@ -243,7 +243,7 @@ export default function AppRoutes() {
       <Route
         path="/inventory/transactions"
         element={
-          <Protected>
+          <Protected permission="transactions.view">
             <Transactions />
           </Protected>
         }
@@ -258,7 +258,9 @@ export default function AppRoutes() {
       />
       <Route
         path="/inventory/borrow-records/pending"
-        element={<Navigate to="/inventory/borrow-records" replace />}
+        element={<Protected permission="borrows.view">
+          <Navigate to="/inventory/borrow-records" replace />
+        </Protected>}
       />
       <Route
         path="/inventory/borrow-records/overdue"

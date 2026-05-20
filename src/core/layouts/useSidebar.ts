@@ -207,9 +207,14 @@ const INVENTORY_GROUPS: NavGroup[] = [
   {
     label: "Administration",
     items: INVENTORY_NAV.filter((n) =>
-      ["Users", "Roles", "Permissions", "Activity Log", "My Profile"].includes(
-        n.title,
-      ),
+      [
+        "Users",
+        "Roles",
+        "Permissions",
+        "Activity Log",
+        "Transactions",
+        "My Profile",
+      ].includes(n.title),
     ),
   },
 ];
@@ -255,20 +260,17 @@ export function useSidebar() {
   const { isRole } = useAuth();
 
   const isAdmin = isRole("admin");
-  const isManager = isRole("lab-manager") || isRole("lab_manager");
 
   const navGroups = useMemo(() => {
     return INVENTORY_GROUPS.map((group) => {
       if (group.label === "Administration") {
-        if (isAdmin || isManager) return group;
-        return {
-          ...group,
-          items: group.items.filter((item) => item.title === "My Profile"),
-        };
+        return isAdmin ? group : null;
       }
       return group;
-    }).filter((group) => group.items.length > 0);
-  }, [isAdmin, isManager]);
+    })
+      .filter((group): group is NavGroup => group != null)
+      .filter((group) => group.items.length > 0);
+  }, [isAdmin]);
 
   const isActive = useCallback(
     (item: NavItem) =>
