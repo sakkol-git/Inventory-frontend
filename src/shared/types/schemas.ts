@@ -315,6 +315,17 @@ export const storeUserDocumentSchema = z.object({
 });
 export type StoreUserDocumentPayload = z.infer<typeof storeUserDocumentSchema>;
 
+export const updateUserDocumentSchema = z.object({
+  file: z
+    .instanceof(File)
+    .refine((f) => f.size <= 10 * 1024 * 1024, "File max 10MB")
+    .optional(),
+  title: z.string().min(1, "Title is required").max(255).optional(),
+  file_type: z.enum(["pdf", "doc", "image", "certificate", "other"]).optional(),
+  description: z.string().nullable().optional(),
+});
+export type UpdateUserDocumentPayload = z.infer<typeof updateUserDocumentSchema>;
+
 // ── User (Admin CRUD) ─────────────────────────────────────────────────────
 export const storeUserSchema = z
   .object({

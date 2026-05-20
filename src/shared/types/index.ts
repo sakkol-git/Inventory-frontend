@@ -270,6 +270,12 @@ export interface Transaction {
 }
 
 // ── Achievement ───────────────────────────────────────────────────────────
+export interface AchievementUser {
+  id: number;
+  name?: string;
+  email?: string;
+}
+
 export interface Achievement {
   id: number;
   name: string;
@@ -277,6 +283,8 @@ export interface Achievement {
   criteria_type: string;
   criteria_value: number;
   icon: string | null;
+  assigned_user_ids?: number[];
+  users?: AchievementUser[];
   earned_at?: string;
   created_at: string;
   updated_at: string;
@@ -287,7 +295,8 @@ export interface UserDocument {
   id: number;
   user_id: number;
   title: string;
-  file_path: string;
+  file_path?: string;
+  download_url?: string;
   file_type: "pdf" | "doc" | "image" | "certificate" | "other";
   file_size: number;
   description: string | null;

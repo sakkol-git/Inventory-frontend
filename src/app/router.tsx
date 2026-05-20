@@ -65,10 +65,10 @@ const Equipment = lazyRoute(
   () => import("@/features/inventory/pages/equipment/Equipment"),
   { displayName: "Equipment" },
 );
-const ChemicalBatches = lazyRoute(
-  () => import("@/features/inventory/pages/chemical/ChemicalBatches"),
-  { displayName: "ChemicalBatches" },
-);
+// const ChemicalBatches = lazyRoute(
+//   () => import("@/features/inventory/pages/chemical/ChemicalBatches"),
+//   { displayName: "ChemicalBatches" },
+// );
 const Transactions = lazyRoute(
   () => import("@/features/inventory/pages/transaction/Transactions"),
   { displayName: "Transactions" },
@@ -77,23 +77,23 @@ const BorrowRecords = lazyRoute(
   () => import("@/features/inventory/pages/borrow-record/BorrowRecords"),
   { displayName: "BorrowRecords" },
 );
-const MaintenanceRecords = lazyRoute(
-  () => import("@/features/inventory/pages/equipment/MaintenanceRecords"),
-  { displayName: "MaintenanceRecords" },
-);
+// const MaintenanceRecords = lazyRoute(
+//   () => import("@/features/inventory/pages/equipment/MaintenanceRecords"),
+//   { displayName: "MaintenanceRecords" },
+// );
 const Achievements = lazyRoute(
   () => import("@/features/inventory/pages/Achievments/Achievements"),
   { displayName: "Achievements" },
 );
 const UserDocuments = lazyRoute(
-  () => import("@/features/inventory/pages/user/UserDocuments"),
+  () => import("@/features/inventory/pages/user-documents/UserDocuments"),
   { displayName: "UserDocuments" },
 );
 const Users = lazyRoute(() => import("@/features/admin/pages/Users"), {
   displayName: "Users",
 });
 const UserProfile = lazyRoute(
-  () => import("@/features/inventory/pages/user/UserProfile"),
+  () => import("@/features/inventory/pages/user-profile/UserProfile"),
   { displayName: "UserProfile" },
 );
 
@@ -291,7 +291,7 @@ export default function AppRoutes() {
       <Route
         path="/inventory/documents"
         element={
-          <Protected permission="user_documents.view">
+          <Protected permission="documents.view">
             <UserDocuments />
           </Protected>
         }

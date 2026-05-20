@@ -88,12 +88,19 @@ export const useAssignAchievement = () => {
       achievementId: number;
       userId: number;
     }) => {
-      const { data } = await api.post<{ message: string }>(
+      const { data } = await api.post<ApiResponse<Achievement>>(
         `/achievements/${achievementId}/assign/${userId}`,
       );
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: (response) => {
+      const achievement = response.data;
+      queryClient.setQueryData([...QUERY_KEY, achievement.id], achievement);
+      queryClient.setQueriesData<Achievement[]>({ queryKey: QUERY_KEY }, (current) => {
+        if (!Array.isArray(current)) return current;
+        return current.map((item) => (item.id === achievement.id ? achievement : item));
+      });
+    },
   });
 };
 
@@ -107,11 +114,18 @@ export const useRevokeAchievement = () => {
       achievementId: number;
       userId: number;
     }) => {
-      const { data } = await api.delete<{ message: string }>(
+      const { data } = await api.delete<ApiResponse<Achievement>>(
         `/achievements/${achievementId}/revoke/${userId}`,
       );
       return data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: (response) => {
+      const achievement = response.data;
+      queryClient.setQueryData([...QUERY_KEY, achievement.id], achievement);
+      queryClient.setQueriesData<Achievement[]>({ queryKey: QUERY_KEY }, (current) => {
+        if (!Array.isArray(current)) return current;
+        return current.map((item) => (item.id === achievement.id ? achievement : item));
+      });
+    },
   });
 };
