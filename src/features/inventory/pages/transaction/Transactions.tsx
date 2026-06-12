@@ -28,6 +28,7 @@ import {
 import AppLayout from "@/core/layouts/AppLayout";
 import EmptyState from "@/shared/components/EmptyState";
 import PageHeader from "@/shared/components/PageHeader";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import SearchFilter from "@/shared/components/SearchFilter";
 import { cn } from "@/shared/lib/utils";
 
@@ -95,34 +96,7 @@ const Transactions = () => {
 
         {hasResults && <TransactionTable transactions={view.items} />}
 
-        <footer className="flex items-center justify-between text-sm text-muted-foreground">
-          <p>
-            Showing {view.items.length} of {view.totalCount} transactions
-          </p>
-          {view.meta && view.meta.last_page > 1 && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={view.page <= 1}
-                onClick={() => view.setPage(view.page - 1)}
-              >
-                Previous
-              </Button>
-              <span className="text-xs">
-                Page {view.meta.current_page} of {view.meta.last_page}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={view.page >= view.meta.last_page}
-                onClick={() => view.setPage(view.page + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </footer>
+        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
       </div>
     </AppLayout>
   );

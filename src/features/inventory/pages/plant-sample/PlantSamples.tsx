@@ -8,30 +8,30 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/ui/ProductCard";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/core/layouts/AppLayout";
@@ -40,6 +40,7 @@ import EmptyState from "@/shared/components/EmptyState";
 import { ExportButton } from "@/shared/components/ExportButton";
 import { FilterChips } from "@/shared/components/FilterChips";
 import PageHeader from "@/shared/components/PageHeader";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { QuickStats } from "@/shared/components/QuickStats";
 import SearchFilter from "@/shared/components/SearchFilter";
 import { ViewToggle } from "@/shared/components/ViewToggle";
@@ -47,11 +48,11 @@ import { useAnnounceEffect } from "@/shared/hooks/useAnnounce";
 import { cn } from "@/shared/lib/utils";
 
 import {
-    formatEnumLabel,
-    LAB_LOCATIONS,
-    SAMPLE_STATUSES,
-    STATUS_COLORS,
-    usePlantSamplesView,
+  formatEnumLabel,
+  LAB_LOCATIONS,
+  SAMPLE_STATUSES,
+  STATUS_COLORS,
+  usePlantSamplesView,
 } from "./usePlantSamplesView";
 
 const PreviewImg = ({ src }: { src: string }) => {
@@ -138,12 +139,12 @@ const PlantSamples = () => {
           filters={
             view.statusFilter !== "all"
               ? [
-                  {
-                    id: "status",
-                    label: "Status",
-                    value: formatEnumLabel(view.statusFilter),
-                  },
-                ]
+                {
+                  id: "status",
+                  label: "Status",
+                  value: formatEnumLabel(view.statusFilter),
+                },
+              ]
               : []
           }
           onRemove={() => view.setStatusFilter("all")}
@@ -194,20 +195,20 @@ const PlantSamples = () => {
                   meta={[
                     item.relationships.variety?.name
                       ? {
-                          label: "Variety:",
-                          value: item.relationships.variety.name,
-                        }
+                        label: "Variety:",
+                        value: item.relationships.variety.name,
+                      }
                       : null,
                     item.details.owner
                       ? {
-                          icon: User,
-                          value: item.details.owner,
-                        }
+                        icon: User,
+                        value: item.details.owner,
+                      }
                       : item.relationships.contributor?.name
                         ? {
-                            icon: User,
-                            value: item.relationships.contributor.name,
-                          }
+                          icon: User,
+                          value: item.relationships.contributor.name,
+                        }
                         : null,
                     item.details.origin
                       ? { icon: MapPin, value: item.details.origin }
@@ -300,6 +301,8 @@ const PlantSamples = () => {
             </Table>
           </div>
         )}
+
+        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
       </div>
 
       {/* ── Create / Edit Dialog ── */}

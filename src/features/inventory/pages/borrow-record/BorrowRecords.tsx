@@ -53,6 +53,7 @@ import { ErrorState } from "@/shared/components/ErrorState";
 import { LoadingState } from "@/shared/components/LoadingState";
 import PageHeader from "@/shared/components/PageHeader";
 import SearchFilter from "@/shared/components/SearchFilter";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { cn } from "@/shared/lib/utils";
 
 // ─── Hook & Helpers ────────────────────────────────────────────────────────
@@ -183,34 +184,7 @@ const BorrowRecords = () => {
         )}
 
         {view.activeTab === "all" && (
-          <footer className="flex items-center justify-between text-sm text-muted-foreground">
-            <p>
-              Showing {view.items.length} of {view.totalCount} records
-            </p>
-            {view.meta && view.meta.last_page > 1 && (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={view.page <= 1}
-                  onClick={() => view.setPage(view.page - 1)}
-                >
-                  Previous
-                </Button>
-                <span className="text-xs">
-                  Page {view.meta.current_page} of {view.meta.last_page}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={view.page >= view.meta.last_page}
-                  onClick={() => view.setPage(view.page + 1)}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </footer>
+          <ServerPagination meta={view.meta} onPageChange={view.setPage} />
         )}
       </div>
 

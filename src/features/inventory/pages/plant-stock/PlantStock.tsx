@@ -38,6 +38,7 @@ import AppLayout from "@/core/layouts/AppLayout";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import EmptyState from "@/shared/components/EmptyState";
 import PageHeader from "@/shared/components/PageHeader";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { QuickStats } from "@/shared/components/QuickStats";
 import SearchFilter from "@/shared/components/SearchFilter";
 import { ViewToggle } from "@/shared/components/ViewToggle";
@@ -112,12 +113,7 @@ const PlantStock = () => {
           />
         )}
 
-        <footer className="flex items-center justify-between text-sm text-muted-foreground">
-          <p>
-            Showing {view.filteredItems.length} of {view.totalCount} stock
-            entries
-          </p>
-        </footer>
+        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
       </div>
 
       <StockFormDialog view={view} />

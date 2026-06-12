@@ -42,6 +42,7 @@ import { ExportButton } from "@/shared/components/ExportButton";
 import PageHeader from "@/shared/components/PageHeader";
 import { QuickStats } from "@/shared/components/QuickStats";
 import SearchFilter from "@/shared/components/SearchFilter";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { ViewToggle } from "@/shared/components/ViewToggle";
 import { usePlantVarietiesView } from "./usePlantVarietiesView";
 
@@ -187,6 +188,8 @@ const PlantVarieties = () => {
             </Table>
           </div>
         )}
+
+        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
       </div>
 
       {/* ── Create / Edit Dialog ── */}

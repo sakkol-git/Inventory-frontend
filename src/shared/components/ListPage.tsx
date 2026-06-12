@@ -21,6 +21,7 @@ import { LoadingState } from "@/shared/components/LoadingState";
 import PageHeader from "@/shared/components/PageHeader";
 import type { UsePaginationOptions } from "@/shared/components/Pagination";
 import { PaginationBar, usePagination } from "@/shared/components/Pagination";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { QuickStats, type Stat } from "@/shared/components/QuickStats";
 import SearchFilter from "@/shared/components/SearchFilter";
 import { ViewToggle } from "@/shared/components/ViewToggle";
@@ -51,6 +52,15 @@ export interface ListPageProps<T> {
   isLoading?: boolean;
   isError?: boolean;
   paginationOptions?: UsePaginationOptions;
+  meta?: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+  } | null | undefined;
+  onPageChange?: (page: number) => void;
 
   /* ── Empty State ────────────────────────────────────── */
   emptyTitle: string;
@@ -87,6 +97,8 @@ export function ListPage<T>({
   isLoading = false,
   isError = false,
   paginationOptions = { defaultPageSize: 20 },
+  meta,
+  onPageChange,
   emptyTitle,
   emptyDescription,
   renderGrid,
@@ -147,27 +159,31 @@ export function ListPage<T>({
 
         {hasResults &&
           viewMode === "grid" &&
-          renderGrid(pagination.paginatedItems)}
+          (meta ? renderGrid(items) : renderGrid(pagination.paginatedItems))}
 
         {hasResults &&
           viewMode === "list" &&
-          renderTable(pagination.paginatedItems)}
+          (meta ? renderTable(items) : renderTable(pagination.paginatedItems))}
 
-        <PaginationBar
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          totalItems={pagination.totalItems}
-          pageSize={pagination.pageSize}
-          pageSizeOptions={pagination.pageSizeOptions}
-          onPageChange={pagination.goToPage}
-          onPageSizeChange={pagination.changePageSize}
-          hasNextPage={pagination.hasNextPage}
-          hasPrevPage={pagination.hasPrevPage}
-          onFirst={pagination.firstPage}
-          onLast={pagination.lastPage}
-          onNext={pagination.nextPage}
-          onPrev={pagination.prevPage}
-        />
+        {meta && onPageChange ? (
+          <ServerPagination meta={meta} onPageChange={onPageChange} />
+        ) : (
+          <PaginationBar
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            pageSize={pagination.pageSize}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageChange={pagination.goToPage}
+            onPageSizeChange={pagination.changePageSize}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            onFirst={pagination.firstPage}
+            onLast={pagination.lastPage}
+            onNext={pagination.nextPage}
+            onPrev={pagination.prevPage}
+          />
+        )}
       </div>
 
       {children}

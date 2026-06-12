@@ -89,6 +89,8 @@ const Equipment = () => {
       viewMode={view.viewMode}
       onViewModeChange={view.switchViewMode}
       items={view.filteredItems}
+      meta={view.meta}
+      onPageChange={view.setPage}
       isLoading={view.isLoading}
       isError={view.isError}
       emptyTitle="No equipment found"

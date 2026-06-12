@@ -59,6 +59,10 @@ const Chemicals = () => {
       viewMode={view.viewMode}
       onViewModeChange={view.switchViewMode}
       items={view.filteredItems}
+      meta={view.meta}
+      onPageChange={view.setPage}
+      isLoading={view.isLoading}
+      isError={view.isError}
       emptyTitle="No chemicals found"
       emptyDescription="Try adjusting your search."
       alertSlot={

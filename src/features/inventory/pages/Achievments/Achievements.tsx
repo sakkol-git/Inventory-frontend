@@ -15,6 +15,7 @@ import { AchievementAssignmentsDialog } from "./AchievementAssignmentsDialog";
 import { AchievementFormDialog } from "./AchievementFormDialog";
 import { AchievementsTable } from "./AchievementsTable";
 import { useAchievementsView } from "./useAchievementsView";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 
 const Achievements = () => {
   const view = useAchievementsView();
@@ -60,6 +61,8 @@ const Achievements = () => {
             onDelete={view.requestDeleteAchievement}
           />
         )}
+
+        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
       </div>
 
       <AchievementFormDialog

@@ -26,21 +26,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download } from "lucide-react";
 
-interface ExportColumn {
+interface ExportColumn<T = Record<string, unknown>> {
   key: string;
   label: string;
   /** Optional value getter for nested properties */
-  getValue?: (row: Record<string, unknown>) => string | number;
+  getValue?: (row: T) => string | number;
 }
 
-interface ExportButtonProps {
-  data: Record<string, unknown>[];
+interface ExportButtonProps<T = Record<string, unknown>> {
+  data: T[];
   filename: string;
-  columns: ExportColumn[];
+  columns: ExportColumn<T>[];
   className?: string;
 }
 
-function getCellValue(row: Record<string, unknown>, col: ExportColumn): string {
+function getCellValue<T>(row: T, col: ExportColumn<T>): string {
   if (col.getValue) {
     return String(col.getValue(row) ?? "");
   }
@@ -69,9 +69,9 @@ function downloadBlob(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-function exportCSV(
-  data: Record<string, unknown>[],
-  columns: ExportColumn[],
+function exportCSV<T>(
+  data: T[],
+  columns: ExportColumn<T>[],
   filename: string,
 ) {
   const header = columns.map((c) => `"${c.label}"`).join(",");
@@ -88,9 +88,9 @@ function exportCSV(
   downloadBlob(csv, `${filename}.csv`, "text/csv;charset=utf-8;");
 }
 
-function exportJSON(
-  data: Record<string, unknown>[],
-  columns: ExportColumn[],
+function exportJSON<T>(
+  data: T[],
+  columns: ExportColumn<T>[],
   filename: string,
 ) {
   const mapped = data.map((row) => {
@@ -104,12 +104,12 @@ function exportJSON(
   downloadBlob(json, `${filename}.json`, "application/json");
 }
 
-export function ExportButton({
+export function ExportButton<T>({
   data,
   filename,
   columns,
   className,
-}: ExportButtonProps) {
+}: ExportButtonProps<T>) {
   if (!data.length) return null;
 
   return (
