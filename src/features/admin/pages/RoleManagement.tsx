@@ -9,22 +9,22 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { PermissionGate } from "@/core/auth/PermissionGate";
 import AppLayout from "@/core/layouts/AppLayout";
@@ -32,14 +32,14 @@ import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import PageHeader from "@/shared/components/PageHeader";
 
 import {
-    useAssignPermissionToRole,
-    useCreateRole,
-    useDeleteRole,
-    usePermissions,
-    useRemovePermissionFromRole,
-    useRolePermissions,
-    useRoles,
-    useUpdateRole,
+  useAssignPermissionToRole,
+  useCreateRole,
+  useDeleteRole,
+  usePermissions,
+  useRemovePermissionFromRole,
+  useRolePermissions,
+  useRoles,
+  useUpdateRole,
 } from "@/features/admin/services";
 import type { Role } from "@/shared/types/index";
 
@@ -314,16 +314,23 @@ const RoleManagement = () => {
             <div className="space-y-4 mt-2">
               <div className="flex gap-2">
                 <select
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm disabled:opacity-50"
                   value={assignPermission}
                   onChange={(e) => setAssignPermission(e.target.value)}
+                  disabled={availablePerms.length === 0}
                 >
-                  <option value="">Select permission to assign…</option>
-                  {availablePerms.map((p) => (
-                    <option key={p.id} value={p.name}>
-                      {p.name}
-                    </option>
-                  ))}
+                  {availablePerms.length === 0 ? (
+                    <option value="">All permissions already assigned</option>
+                  ) : (
+                    <>
+                      <option value="">Select permission to assign…</option>
+                      {availablePerms.map((p) => (
+                        <option key={p.id} value={p.name}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </>
+                  )}
                 </select>
                 <Button
                   onClick={handleAssignPerm}
