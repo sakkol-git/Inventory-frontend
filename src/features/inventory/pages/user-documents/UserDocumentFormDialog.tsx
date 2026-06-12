@@ -1,5 +1,5 @@
 import { Paperclip } from "lucide-react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +9,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -61,93 +69,103 @@ const UserDocumentFormDialog = <TFieldValues extends FieldValues>({
           <p className="text-sm text-muted-foreground">{description}</p>
         </DialogHeader>
 
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor={`${mode}-title`}>Title</Label>
-            <Input id={`${mode}-title`} {...form.register("title")} />
-            {form.formState.errors.title && (
-              <p className="text-xs text-destructive">
-                {String(form.formState.errors.title.message)}
-              </p>
-            )}
-          </div>
+        <Form {...form}>
+          <form className="space-y-4" onSubmit={onSubmit}>
+            <FormField
+              control={form.control}
+              name={"title" as Path<TFieldValues>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input id={`${mode}-title`} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor={`${mode}-file-type`}>File Type</Label>
-            <Select
-              value={String(form.watch("file_type") ?? "")}
-              onValueChange={(value) => {
-                form.setValue("file_type", value as never, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-            >
-              <SelectTrigger id={`${mode}-file-type`}>
-                <SelectValue placeholder="Select file type" />
-              </SelectTrigger>
-              <SelectContent>
-                {FILE_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.file_type && (
-              <p className="text-xs text-destructive">
-                {String(form.formState.errors.file_type.message)}
-              </p>
-            )}
-          </div>
+            <FormField
+              control={form.control}
+              name={"file_type" as Path<TFieldValues>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>File Type</FormLabel>
+                  <Select value={String(field.value || "")} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger id={`${mode}-file-type`}>
+                        <SelectValue placeholder="Select file type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {FILE_TYPES.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor={`${mode}-file`}>
-              {fileRequired ? "File" : "Replace File"}
-            </Label>
-            <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2">
-              <Paperclip className="h-4 w-4 text-muted-foreground" />
-              <Input
-                id={`${mode}-file`}
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,image/*"
-                className="border-0 p-0 shadow-none focus-visible:ring-0"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  form.setValue("file", file as never, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                  });
-                }}
-              />
+            <FormField
+              control={form.control}
+              name={"file" as Path<TFieldValues>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{fileRequired ? "File" : "Replace File"}</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+                      <Paperclip className="h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id={`${mode}-file`}
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx,image/*"
+                        className="border-0 p-0 shadow-none focus-visible:ring-0 aria-invalid:border-0"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          field.onChange(file);
+                        }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormDescription>
+                    {fileRequired
+                      ? "Upload a document file. Maximum size is 10 MB."
+                      : "Leave empty to keep the current file."}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={"description" as Path<TFieldValues>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input id={`${mode}-description`} {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-end gap-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Saving…" : mode === "create" ? "Upload" : "Update"}
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {fileRequired
-                ? "Upload a document file. Maximum size is 10 MB."
-                : "Leave empty to keep the current file."}
-            </p>
-            {form.formState.errors.file && (
-              <p className="text-xs text-destructive">
-                {String(form.formState.errors.file.message)}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`${mode}-description`}>Description</Label>
-            <Input id={`${mode}-description`} {...form.register("description")} />
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving…" : mode === "create" ? "Upload" : "Update"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

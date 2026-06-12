@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import type { StoreAchievementPayload } from "@/shared/types/schemas";
 import type { FormEventHandler } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -43,17 +44,19 @@ export const AchievementFormDialog = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="space-y-4 mt-2">
-          <AchievementFormFields form={form} />
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving…" : actionLabel}
-            </Button>
-          </div>
-        </form>
+        <Form {...form}>
+          <form onSubmit={onSubmit} className="space-y-4 mt-2">
+            <AchievementFormFields form={form} />
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Saving…" : actionLabel}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

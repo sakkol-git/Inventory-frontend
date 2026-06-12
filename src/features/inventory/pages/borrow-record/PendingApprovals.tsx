@@ -18,8 +18,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Table,
     TableBody,
@@ -180,27 +187,35 @@ const PendingApprovals = () => {
             <DialogHeader>
               <DialogTitle>Approve Borrow Request</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleApprove} className="space-y-4 mt-2">
-              <div className="space-y-1">
-                <Label>Notes (optional)</Label>
-                <Input
-                  {...approveForm.register("notes")}
-                  placeholder="Approval notes…"
+            <Form {...approveForm}>
+              <form onSubmit={handleApprove} className="space-y-4 mt-2">
+                <FormField
+                  control={approveForm.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes (optional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="Approval notes…" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setApproveItem(null)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={approveMutation.isPending}>
-                  {approveMutation.isPending ? "Approving…" : "Approve"}
-                </Button>
-              </DialogFooter>
-            </form>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setApproveItem(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={approveMutation.isPending}>
+                    {approveMutation.isPending ? "Approving…" : "Approve"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
 
@@ -213,39 +228,39 @@ const PendingApprovals = () => {
             <DialogHeader>
               <DialogTitle>Reject Borrow Request</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleReject} className="space-y-4 mt-2">
-              <div className="space-y-1">
-                <Label>Rejection Reason *</Label>
-                <Input
-                  {...rejectForm.register("rejected_reason")}
-                  placeholder="Reason for rejection…"
+            <Form {...rejectForm}>
+              <form onSubmit={handleReject} className="space-y-4 mt-2">
+                <FormField
+                  control={rejectForm.control}
+                  name="rejected_reason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rejection Reason *</FormLabel>
+                      <FormControl>
+                        <Input {...field} value={field.value || ""} placeholder="Reason for rejection…" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {rejectForm.formState.errors.rejected_reason && (
-                  <p className="text-xs text-destructive">
-                    {
-                      rejectForm.formState.errors.rejected_reason
-                        .message as string
-                    }
-                  </p>
-                )}
-              </div>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setRejectItem(null)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="destructive"
-                  disabled={rejectMutation.isPending}
-                >
-                  {rejectMutation.isPending ? "Rejecting…" : "Reject"}
-                </Button>
-              </DialogFooter>
-            </form>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setRejectItem(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="destructive"
+                    disabled={rejectMutation.isPending}
+                  >
+                    {rejectMutation.isPending ? "Rejecting…" : "Reject"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
       </div>

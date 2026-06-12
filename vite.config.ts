@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
     proxy: {
       "/api": {
-        target: process.env.VITE_BACKEND_URL || "https://inventory-backend-main-jwnkbo.laravel.cloud",
+        target: process.env.VITE_BACKEND_URL,
         changeOrigin: true,
         secure: false,
       },

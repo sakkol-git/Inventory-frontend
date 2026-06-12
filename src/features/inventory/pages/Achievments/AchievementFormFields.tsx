@@ -1,5 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import type { StoreAchievementPayload } from "@/shared/types/schemas";
 import type { UseFormReturn } from "react-hook-form";
 
@@ -8,44 +14,79 @@ type AchievementFormFieldsProps = {
 };
 
 export const AchievementFormFields = ({ form }: AchievementFormFieldsProps) => {
-  const {
-    register,
-    formState: { errors },
-  } = form;
-
   return (
     <>
-      <div className="space-y-1">
-        <Label htmlFor="achievement-name">Name *</Label>
-        <Input id="achievement-name" {...register("achievement_name")} />
-        {errors.achievement_name?.message ? (
-          <p className="text-xs text-destructive">{errors.achievement_name.message}</p>
-        ) : null}
-      </div>
-      <div className="space-y-1">
-        <Label>Description</Label>
-        <Input {...register("description")} />
-      </div>
+      <FormField
+        control={form.control}
+        name="achievement_name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Name *</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input {...field} value={(field.value as string) || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label>Criteria Type *</Label>
-          <Input {...register("criteria_type")} placeholder="e.g. borrows_count" />
-          {errors.criteria_type?.message ? (
-            <p className="text-xs text-destructive">{errors.criteria_type.message}</p>
-          ) : null}
-        </div>
-        <div className="space-y-1">
-          <Label>Criteria Value *</Label>
-          <Input type="number" {...register("criteria_value", { valueAsNumber: true })} />
-          {errors.criteria_value?.message ? (
-            <p className="text-xs text-destructive">{errors.criteria_value.message}</p>
-          ) : null}
-        </div>
+        <FormField
+          control={form.control}
+          name="criteria_type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Criteria Type *</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="e.g. borrows_count" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="criteria_value"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Criteria Value *</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
-      <div className="space-y-1">
-        <Label>Icon (emoji or code)</Label>
-        <Input {...register("icon")} placeholder="🏆" />
-      </div>
+      <FormField
+        control={form.control}
+        name="image_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Icon or Image URL</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="https://... or emoji" value={(field.value as string) || ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

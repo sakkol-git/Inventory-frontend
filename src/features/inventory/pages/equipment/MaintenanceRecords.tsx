@@ -18,8 +18,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -241,21 +248,23 @@ const MaintenanceRecords = () => {
               Record scheduled or unscheduled maintenance for equipment.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4 mt-2">
-            <MaintenanceFormFields form={createForm} />
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setCreateOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={createMutation.isPending}>
-                {createMutation.isPending ? "Saving…" : "Create Record"}
-              </Button>
-            </div>
-          </form>
+          <Form {...createForm}>
+            <form onSubmit={handleCreate} className="space-y-4 mt-2">
+              <MaintenanceFormFields form={createForm} />
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCreateOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending}>
+                  {createMutation.isPending ? "Saving…" : "Create Record"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -268,21 +277,23 @@ const MaintenanceRecords = () => {
               Update the details of this maintenance record.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleEdit} className="space-y-4 mt-2">
-            <MaintenanceFormFields form={editForm} />
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setEditItem(null)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? "Saving…" : "Save Changes"}
-              </Button>
-            </div>
-          </form>
+          <Form {...editForm}>
+            <form onSubmit={handleEdit} className="space-y-4 mt-2">
+              <MaintenanceFormFields form={editForm} />
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setEditItem(null)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending ? "Saving…" : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
 
@@ -302,102 +313,154 @@ const MaintenanceRecords = () => {
 
 // ── Shared Form Fields ────────────────────────────────────────────────────
 const MaintenanceFormFields = ({ form }: { form: UseFormReturn<StoreMaintenanceRecordPayload> }) => {
-  const {
-    register,
-    setValue,
-    watch,
-    formState: { errors },
-  } = form;
-  const maintenanceType = watch("maintenance_type");
-
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="equipment-id">Equipment ID *</Label>
-          <Input
-            id="equipment-id"
-            autoFocus
-            type="number"
-            {...register("equipment_id", { valueAsNumber: true })}
-          />
-          {errors.equipment_id && (
-            <p className="text-xs text-destructive">
-              {errors.equipment_id.message as string}
-            </p>
+        <FormField
+          control={form.control}
+          name="equipment_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Equipment ID *</FormLabel>
+              <FormControl>
+                <Input
+                  autoFocus
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
-        <div className="space-y-1">
-          <Label>Type *</Label>
-          <Select
-            value={maintenanceType}
-            onValueChange={(v) => setValue("maintenance_type", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              {MAINTENANCE_TYPES.map((t) => (
-                <SelectItem key={t.value} value={t.value}>
-                  {t.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.maintenance_type && (
-            <p className="text-xs text-destructive">
-              {errors.maintenance_type.message as string}
-            </p>
+        />
+        <FormField
+          control={form.control}
+          name="maintenance_type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Type *</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {MAINTENANCE_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
+        />
       </div>
-      <div className="space-y-1">
-        <Label>Description *</Label>
-        <Input {...register("description")} />
-        {errors.description && (
-          <p className="text-xs text-destructive">
-            {errors.description.message as string}
-          </p>
+      <FormField
+        control={form.control}
+        name="description"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description *</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
-      </div>
+      />
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label>Started At *</Label>
-          <Input type="date" {...register("started_at")} />
-          {errors.started_at && (
-            <p className="text-xs text-destructive">
-              {errors.started_at.message as string}
-            </p>
+        <FormField
+          control={form.control}
+          name="started_at"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Started At *</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
-        <div className="space-y-1">
-          <Label>Completed At</Label>
-          <Input type="date" {...register("completed_at")} />
-        </div>
+        />
+        <FormField
+          control={form.control}
+          name="completed_at"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Completed At</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} value={field.value || ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label>Technician Name</Label>
-          <Input {...register("technician_name")} />
-        </div>
-        <div className="space-y-1">
-          <Label>Next Service Date</Label>
-          <Input type="date" {...register("next_service_date")} />
-        </div>
+        <FormField
+          control={form.control}
+          name="technician_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Technician Name</FormLabel>
+              <FormControl>
+                <Input {...field} value={field.value || ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="next_service_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Next Service Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} value={field.value || ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label>Cost</Label>
-          <Input
-            type="number"
-            step="0.01"
-            {...register("cost", { valueAsNumber: true })}
-          />
-        </div>
-        <div className="space-y-1">
-          <Label>Notes</Label>
-          <Input {...register("notes")} />
-        </div>
+        <FormField
+          control={form.control}
+          name="cost"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cost</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  step="0.01"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes</FormLabel>
+              <FormControl>
+                <Input {...field} value={field.value || ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </>
   );
