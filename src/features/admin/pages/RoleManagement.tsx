@@ -65,7 +65,7 @@ const RoleManagement = () => {
   const { data: allPermissions = [] } = usePermissions();
 
   const handleCreate = async () => {
-    if (!createName.trim()) return;
+    if (!createName.trim() || createMutation.isPending) return;
     try {
       await createMutation.mutateAsync({ name: createName.trim() });
       toast.success("Role created");
@@ -78,7 +78,7 @@ const RoleManagement = () => {
   };
 
   const handleEdit = async () => {
-    if (!editItem || !editName.trim()) return;
+    if (!editItem || !editName.trim() || updateMutation.isPending) return;
     try {
       await updateMutation.mutateAsync({
         id: editItem.id,
@@ -93,7 +93,7 @@ const RoleManagement = () => {
   };
 
   const handleDelete = async () => {
-    if (!deleteId) return;
+    if (!deleteId || deleteMutation.isPending) return;
     try {
       await deleteMutation.mutateAsync(deleteId);
       toast.success("Role deleted");
@@ -105,7 +105,7 @@ const RoleManagement = () => {
   };
 
   const handleAssignPerm = async () => {
-    if (!permissionsRoleId || !assignPermission) return;
+    if (!permissionsRoleId || !assignPermission || assignPermMutation.isPending) return;
     try {
       await assignPermMutation.mutateAsync({
         roleId: permissionsRoleId,

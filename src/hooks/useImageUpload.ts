@@ -121,39 +121,15 @@ export function useImageUpload(initialUrl?: string): UseImageUploadResult {
     setValidationError(null);
     setImageFile(file);
 
-    // ✅ Generate preview URL via FileReader with error handling
-    const reader = new FileReader();
-    readerRef.current = reader;
-
-    reader.onload = (e) => {
-      // ✅ Guard: Only setState if component is still mounted
-      if (!mountedRef.current) return;
-
-      const result = e.target?.result as string;
-      setImagePreviewUrl(result);
-    };
-
-    // ✅ Error handler: If FileReader fails, capture the error
-    reader.onerror = () => {
-      if (!mountedRef.current) return;
-      setValidationError("Failed to read file. Please try again.");
-    };
-
-    // ✅ Add timeout: Prevent hanging on very large files or slow I/O
-    const timeoutId = setTimeout(() => {
-      if (reader.readyState === FileReader.LOADING) {
-        reader.abort();
-        if (mountedRef.current) {
-          setValidationError("File read timed out. Please try a smaller file.");
-        }
-      }
-    }, 10000); // 10 second timeout
-
-    reader.onloadend = () => {
-      clearTimeout(timeoutId);
-    };
-
-    reader.readAsDataURL(file);
+    // Generate immediate, synchronous memory preview URL
+    const objectUrl = URL.createObjectURL(file);
+    
+    // ✅ Guard: Only setState if component is still mounted
+    if (mountedRef.current) {
+        setImagePreviewUrl(objectUrl);
+    } else {
+        URL.revokeObjectURL(objectUrl);
+    }
   }, []);
 
   const setInitialUrl = useCallback((url: string) => {

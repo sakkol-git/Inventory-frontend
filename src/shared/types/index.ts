@@ -225,12 +225,14 @@ export interface BorrowRecord {
   returned_at: string | null;
   is_overdue: boolean;
   notes: string | null;
-  user: { id: number; name: string } | Record<string, never>;
+  borrower?: { id: number; name: string } | null;
+  reviewer?: { id: number; name: string } | null;
   item: {
     type: BorrowableType;
     id: number;
-    data?: Equipment | Chemical | PlantSample;
+    data?: Equipment | Chemical | PlantSample | null;
   };
+  borrowable?: Equipment | Chemical | PlantStock | PlantSample | null;
   created_at: string;
 }
 

@@ -69,6 +69,8 @@ refreshClient.interceptors.request.use(attachToken);
 // 1. Bounding refresh attempts to 1 per token failure
 // 2. Never attempting to refresh the /auth/refresh endpoint itself
 // 3. Ensuring queued requests are rejected (not hung) if refresh fails
+let refreshAttempts = 0;
+const MAX_REFRESH_ATTEMPTS = 1;
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value: unknown) => void;
@@ -118,6 +120,10 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        if (refreshAttempts >= MAX_REFRESH_ATTEMPTS) {
+            throw new Error("Max refresh attempts reached");
+        }
+        refreshAttempts++;
         // Backend returns { access_token: "..." } on refresh
         const { data } = await refreshClient.post<{ access_token: string }>(
           "/auth/refresh",
@@ -126,6 +132,7 @@ api.interceptors.response.use(
         // Update the Authorization header on the queued/original request
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
         processQueue(null, true);
+        refreshAttempts = 0; // reset on success
         return api(originalRequest);
       } catch (refreshError) {
         // ❌ GUARD: If refresh itself fails, immediately reject the queue
@@ -133,6 +140,7 @@ api.interceptors.response.use(
         // The finally block ensures this happens.
         clearToken();
         processQueue(refreshError);
+        refreshAttempts = 0; // reset on failure
         // Force redirect to login on fatal refresh failure
         if (window.location.pathname !== "/login") {
           window.location.href = `/login?from=${encodeURIComponent(window.location.pathname)}`;
@@ -172,9 +180,18 @@ api.interceptors.response.use(
         case 409:
           toast.error(typeof data?.message === "string" ? data.message : `State conflict occurred.${correlationId}`);
           break;
-        case 422:
-          // 422 handled by React Query onError to bind to form fields
+        case 422: {
+          const details = data?.details as Record<string, string[]> | undefined;
+          if (details && typeof details === "object" && Object.keys(details).length > 0) {
+            const fields = Object.entries(details)
+              .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+              .join(' | ');
+            toast.error(`Validation Failed: ${fields}${correlationId}`);
+          } else {
+            toast.error(typeof data?.message === "string" ? data.message : `Validation failed.${correlationId}`);
+          }
           break;
+        }
         case 429:
           toast.error(`Too many requests. Please wait.${correlationId}`);
           break;
@@ -192,8 +209,10 @@ api.interceptors.response.use(
         toast.error("The request timed out. Please check your connection.");
       } else if (!window.navigator.onLine) {
         // Offline state handled by global banner, but can show toast too
+        toast.error("You are currently offline.");
       } else {
-        toast.error("Network error. Please check your connection.");
+        // Safe fallback for unknown network errors or CORS failures
+        toast.error("Network error. Please check your connection or try again later.");
       }
     }
 

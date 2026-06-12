@@ -37,7 +37,7 @@ const ChemicalUsageReportPage = () => {
 
   const handleExport = async () => {
     try {
-      await exportReportCsv("chemical-usage");
+      await exportReportCsv("chemical-usage", "chemical-usage-report.csv", { from, to });
       toast.success("CSV export started");
     } catch {
       toast.error("Failed to export CSV");

@@ -37,7 +37,7 @@ const UserActivityReportPage = () => {
 
   const handleExport = async () => {
     try {
-      await exportReportCsv("user-activity");
+      await exportReportCsv("user-activity", "user-activity-report.csv", { from, to });
       toast.success("CSV export started");
     } catch {
       toast.error("Failed to export CSV");

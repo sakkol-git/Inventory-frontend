@@ -21,8 +21,8 @@ const OverdueBorrows = () => {
   const { data: overdue = [], isLoading } = useOverdueBorrows();
 
   const getBorrowerName = (record: BorrowRecord) =>
-    typeof record.user === "object" && "name" in record.user
-      ? record.user.name
+    typeof record.borrower === "object" && record.borrower !== null && "name" in record.borrower
+      ? record.borrower.name
       : "Unknown";
 
   return (
