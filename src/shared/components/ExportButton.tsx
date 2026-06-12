@@ -26,14 +26,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download } from "lucide-react";
 
-interface ExportColumn<T = Record<string, unknown>> {
+interface ExportColumn<T = any> {
   key: string;
   label: string;
   /** Optional value getter for nested properties */
   getValue?: (row: T) => string | number;
 }
 
-interface ExportButtonProps<T = Record<string, unknown>> {
+interface ExportButtonProps<T = any> {
   data: T[];
   filename: string;
   columns: ExportColumn<T>[];

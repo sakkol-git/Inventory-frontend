@@ -282,6 +282,7 @@ export interface UserDocument {
   file_type: "pdf" | "doc" | "image" | "certificate" | "other";
   file_size: number;
   description: string | null;
+  status: "processing" | "active" | "failed";
   user: { id: number; name: string } | Record<string, never>;
   created_at: string;
   updated_at: string;

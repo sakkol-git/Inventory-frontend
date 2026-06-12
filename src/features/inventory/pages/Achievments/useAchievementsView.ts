@@ -34,7 +34,7 @@ export function useAchievementsView() {
   const { data: achievements = [], isLoading, isError } = useAchievements();
   const assignmentQuery = useAchievementById(assignmentAchievementId ?? 0);
   const { data: userResponse } = useUserList(
-    userSearch ? { search: userSearch, per_page: 10 } : { per_page: 10 },
+    userSearch ? { search: userSearch, per_page: 8 } : { per_page: 8 },
   );
 
   const createMutation = useCreateAchievement();

@@ -41,6 +41,7 @@ const UserDocumentsTable = ({
           <TableHead>Title</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Size</TableHead>
+          <TableHead>Status</TableHead>
           <TableHead>Uploaded By</TableHead>
           <TableHead>Date</TableHead>
           <TableHead className="text-right">Actions</TableHead>
@@ -50,7 +51,7 @@ const UserDocumentsTable = ({
         {isLoading ? (
           <TableRow>
             <TableCell
-              colSpan={6}
+              colSpan={7}
               className="py-8 text-center text-muted-foreground"
             >
               Loading…
@@ -59,7 +60,7 @@ const UserDocumentsTable = ({
         ) : documents.length === 0 ? (
           <TableRow>
             <TableCell
-              colSpan={6}
+              colSpan={7}
               className="py-8 text-center text-muted-foreground"
             >
               No documents uploaded.
@@ -76,6 +77,20 @@ const UserDocumentsTable = ({
               </TableCell>
               <TableCell>{formatFileSize(document.file_size)}</TableCell>
               <TableCell>
+                <Badge
+                  variant={
+                    document.status === "active"
+                      ? "default"
+                      : document.status === "failed"
+                        ? "destructive"
+                        : "outline"
+                  }
+                  className="capitalize"
+                >
+                  {document.status || "active"}
+                </Badge>
+              </TableCell>
+              <TableCell>
                 {typeof document.user === "object" && "name" in document.user
                   ? document.user.name
                   : "—"}
@@ -87,12 +102,24 @@ const UserDocumentsTable = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onDownload(document)}
+                    disabled={document.status !== "active"}
+                    title={document.status !== "active" ? "Document is processing or failed" : "Download"}
                   >
                     <Download className="h-4 w-4" />
+                    <span className="sr-only">Download</span>
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => onEdit(document)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  <PermissionGate permission="documents.update">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => onEdit(document)}
+                      disabled={document.status !== "active"}
+                      title={document.status !== "active" ? "Cannot edit while processing" : "Edit"}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Edit</span>
+                    </Button>
+                  </PermissionGate>
                   <PermissionGate permission="user_documents.delete">
                     <Button
                       variant="ghost"

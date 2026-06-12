@@ -99,53 +99,32 @@ export const dashboardService = {
       );
       return mapBackendDashboard(res.data.data);
     } catch {
-      const [species, chemicals, equipment, transactions, overdue] =
-        await Promise.all([
-          api
-            .get<PaginatedResponse<unknown>>("/plant-species", {
-              params: { per_page: 1 },
-            })
-            .then((response) => response.data),
-          api
-            .get<PaginatedResponse<unknown>>("/chemicals", {
-              params: { per_page: 1 },
-            })
-            .then((response) => response.data),
-          api
-            .get<PaginatedResponse<unknown>>("/equipment", {
-              params: { per_page: 1 },
-            })
-            .then((response) => response.data),
-          api
-            .get<PaginatedResponse<TransactionApi>>("/transactions", {
-              params: { recent: 1, page: 1 },
-            })
-            .then((response) => response.data),
-          api
-            .get<PaginatedResponse<BorrowRecordApi>>(
-              "/borrow-records/overdue",
-              {
-                params: { per_page: 1 },
-              },
-            )
-            .then((response) => response.data)
-            .catch(() => ({ meta: { total: 0 }, data: [] })),
-        ]);
+      // Fallback: manually fetch counts if the aggregated endpoint fails.
+      // We use Promise.allSettled so one failing endpoint doesn't crash the others.
+      const results = await Promise.allSettled([
+        api.get<PaginatedResponse<unknown>>("/plant-species", { params: { per_page: 1 } }),
+        api.get<PaginatedResponse<unknown>>("/chemicals", { params: { per_page: 1 } }),
+        api.get<PaginatedResponse<unknown>>("/equipment", { params: { per_page: 1 } }),
+        api.get<PaginatedResponse<TransactionApi>>("/transactions", { params: { recent: 1, page: 1 } }),
+        api.get<PaginatedResponse<BorrowRecordApi>>("/borrow-records/overdue", { params: { per_page: 1 } }),
+      ]);
+
+      const [speciesResult, chemicalsResult, equipmentResult, transactionsResult, overdueResult] = results;
 
       return {
-        plant_species_count: species.meta.total,
+        plant_species_count: speciesResult.status === "fulfilled" ? speciesResult.value.data.meta.total : 0,
         plant_samples_count: 0,
         samples_by_status: {},
         plant_stocks_count: 0,
         stocks_by_status: {},
-        chemicals_count: chemicals.meta.total,
+        chemicals_count: chemicalsResult.status === "fulfilled" ? chemicalsResult.value.data.meta.total : 0,
         chemicals_expired: 0,
         chemicals_expiring_soon: 0,
         chemicals_low_stock: 0,
-        equipment_count: equipment.meta.total,
+        equipment_count: equipmentResult.status === "fulfilled" ? equipmentResult.value.data.meta.total : 0,
         equipment_by_status: {},
-        overdue_borrows_count: overdue.meta.total,
-        recent_transactions: transactions.data,
+        overdue_borrows_count: overdueResult.status === "fulfilled" ? overdueResult.value.data.meta.total : 0,
+        recent_transactions: transactionsResult.status === "fulfilled" ? transactionsResult.value.data.data : [],
       };
     }
   },
