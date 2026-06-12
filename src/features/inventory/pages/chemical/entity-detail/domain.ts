@@ -91,18 +91,18 @@ export const CHEMICAL_FALLBACK_ICON = FlaskConical;
 
 export const buildActions = (): ActionButton[] => [
   {
-    label: "Increase Qty",
-    icon: ArrowUpCircle,
-    variant: "outline",
-    className: "gap-2 border font-medium text-primary",
-    ariaLabel: "Increase chemical quantity",
-  },
-  {
-    label: "Reduce Qty",
+    label: "Use Chemical",
     icon: ArrowDownCircle,
     variant: "outline",
     className: "gap-2 border font-medium text-destructive",
-    ariaLabel: "Reduce chemical quantity",
+    ariaLabel: "Record chemical usage",
+  },
+  {
+    label: "Add Chemical",
+    icon: ArrowUpCircle,
+    variant: "outline",
+    className: "gap-2 border font-medium text-primary",
+    ariaLabel: "Record chemical addition",
   },
   {
     label: "Edit",

@@ -3,6 +3,7 @@ import { FileText } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { handleFormError } from "@/lib/errors/handleFormError";
 
 import {
   downloadDocument,
@@ -104,9 +105,7 @@ export const useUserDocumentsView = () => {
       toast.success("Document uploaded");
       closeCreateForm();
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Upload failed";
-      toast.error(message);
+      handleFormError(error, createForm, "Upload failed");
     }
   });
 
@@ -120,8 +119,7 @@ export const useUserDocumentsView = () => {
       toast.success("Document updated");
       closeEditForm();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Update failed";
-      toast.error(message);
+      handleFormError(error, editForm, "Update failed");
     }
   });
 

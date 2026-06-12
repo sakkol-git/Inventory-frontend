@@ -92,13 +92,12 @@ export const storePlantSampleSchema = z.object({
     .int()
     .positive(),
   plant_variety_id: z.number().int().positive().nullable().optional(),
-  owner_name: z.string().max(255).nullable().optional(),
+  user_id: z.number().int().positive().nullable().optional(),
   department: z.string().max(255).nullable().optional(),
   origin_location: z.string().max(255).nullable().optional(),
   brought_at: z.string().nullable().optional(),
   lab_location: z.enum(["lab_a", "lab_b", "lab_c"]).nullable().optional(),
   status: z.enum(["active", "inactive", "archived"]),
-  quantity: z.number().int().min(0),
   description: z.string().nullable().optional(),
   image_url: z
     .string()
@@ -190,9 +189,8 @@ export type UpdateChemicalBatchPayload = z.infer<
 // ── Chemical Usage Log ────────────────────────────────────────────────────
 export const storeChemicalUsageLogSchema = z.object({
   chemical_id: z.number().int().positive(),
-  chemical_batch_id: z.number().int().positive().nullable().optional(),
   quantity_used: z.number().min(0.01, "Quantity must be greater than 0"),
-  unit: z.string().min(1, "Unit is required").max(20),
+  unit: z.string().max(20).nullable().optional(),
   purpose: z.string().min(1, "Purpose is required").max(255),
   experiment_name: z.string().max(255).nullable().optional(),
   used_at: z.string().min(1, "Date is required"),
@@ -267,12 +265,11 @@ export type UpdateMaintenanceRecordPayload = z.infer<
 
 // ── Borrow Record ─────────────────────────────────────────────────────────
 export const storeBorrowRecordSchema = z.object({
-  user_id: z.number().int().positive(),
-  borrowable_type: z.enum(["equipment", "chemical", "plant_sample"]),
+  borrowable_type: z.enum(["equipment", "chemical", "plant_sample", "App\\Models\\Equipment", "App\\Models\\Chemical", "App\\Models\\PlantSample"]),
   borrowable_id: z.number().int().positive(),
-  quantity: z.number().int().min(1),
-  due_at: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
+  quantity: z.number().int().min(1).max(10000),
+  due_at: z.string().min(1, "Due date is required"), // Backend requires 'after:today', handled on server or can add refine here
+  notes: z.string().max(1000).nullable().optional(),
 });
 export type StoreBorrowRecordPayload = z.infer<typeof storeBorrowRecordSchema>;
 
@@ -282,7 +279,7 @@ export const approveBorrowSchema = z.object({
 export type ApproveBorrowPayload = z.infer<typeof approveBorrowSchema>;
 
 export const rejectBorrowSchema = z.object({
-  rejected_reason: z.string().min(1, "Reason is required").max(500),
+  rejected_reason: z.string().max(1000).nullable().optional(),
 });
 export type RejectBorrowPayload = z.infer<typeof rejectBorrowSchema>;
 
@@ -297,7 +294,10 @@ export const storeAchievementSchema = z.object({
   description: z.string().nullable().optional(),
   criteria_type: z.string().min(1, "Criteria type is required").max(100),
   criteria_value: z.number().int().min(1),
-  icon: z.string().max(255).nullable().optional(),
+  user_ids: z.array(z.number().int()).optional(),
+  image: z.instanceof(File).optional(),
+  image_url: z.string().url().max(2048).nullable().optional().or(z.literal("")),
+  profile_image_url: z.string().url().max(2048).nullable().optional().or(z.literal("")),
 });
 export type StoreAchievementPayload = z.infer<typeof storeAchievementSchema>;
 
@@ -310,7 +310,7 @@ export const storeUserDocumentSchema = z.object({
     .instanceof(File)
     .refine((f) => f.size <= 10 * 1024 * 1024, "File max 10MB"),
   title: z.string().min(1, "Title is required").max(255),
-  file_type: z.enum(["pdf", "doc", "image", "certificate", "other"]),
+  file_type: z.enum(["doc", "pdf", "image", "certificate", "other"]).nullable().optional(),
   description: z.string().nullable().optional(),
 });
 export type StoreUserDocumentPayload = z.infer<typeof storeUserDocumentSchema>;
@@ -321,7 +321,7 @@ export const updateUserDocumentSchema = z.object({
     .refine((f) => f.size <= 10 * 1024 * 1024, "File max 10MB")
     .optional(),
   title: z.string().min(1, "Title is required").max(255).optional(),
-  file_type: z.enum(["pdf", "doc", "image", "certificate", "other"]).optional(),
+  file_type: z.enum(["doc", "pdf", "image", "certificate", "other"]).nullable().optional(),
   description: z.string().nullable().optional(),
 });
 export type UpdateUserDocumentPayload = z.infer<typeof updateUserDocumentSchema>;

@@ -7,22 +7,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { PermissionGate } from "@/core/auth/PermissionGate";
 import AppLayout from "@/core/layouts/AppLayout";
 import {
-    exportReportCsv,
-    useUserActivityReport,
+  exportReportCsv,
+  useUserActivityReport,
 } from "@/features/reports/services/reportService";
+import { userActivityReportSchema } from "@/lib/schemas/reports";
+import { parseApiResponse } from "@/lib/api/parseApiResponse";
 import PageHeader from "@/shared/components/PageHeader";
 import { Download, Users } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 
 const UserActivityReportPage = () => {
@@ -42,8 +44,40 @@ const UserActivityReportPage = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rows: any[] = (data as any)?.data?.users ?? [];
+  // Parse API response with Zod schema for safety
+  const { parsedRows, hasParseError } = useMemo(() => {
+    let rowsResult: Array<{
+      user_name?: string;
+      name?: string;
+      transactions?: number | string;
+      transaction_count?: number | string;
+      total_borrows?: number | string;
+      borrows?: number | string;
+      borrow_count?: number | string;
+      chemical_usage_logs_count?: number | string;
+      chemical_usages?: number | string;
+      chemical_usage_count?: number | string;
+    }> = [];
+    let hasError = false;
+
+    if (!isLoading && data) {
+      try {
+        const parsed = parseApiResponse(userActivityReportSchema, data);
+        rowsResult = parsed.data?.users ?? [];
+      } catch (err) {
+        hasError = true;
+      }
+    }
+    return { parsedRows: rowsResult, hasParseError: hasError };
+  }, [data, isLoading]);
+
+  useEffect(() => {
+    if (hasParseError) {
+      toast.error("Unexpected server response for user activity report");
+    }
+  }, [hasParseError]);
+
+  const rows = parsedRows;
 
   return (
     <AppLayout>
@@ -117,8 +151,7 @@ const UserActivityReportPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                rows.map((row: any, i: number) => (
+                rows.map((row, i: number) => (
                   <TableRow key={i}>
                     <TableCell className="font-medium">
                       {row.user_name ?? row.name ?? "—"}

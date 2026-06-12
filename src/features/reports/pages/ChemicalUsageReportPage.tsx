@@ -7,22 +7,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { PermissionGate } from "@/core/auth/PermissionGate";
 import AppLayout from "@/core/layouts/AppLayout";
 import {
-    exportReportCsv,
-    useChemicalUsageReport,
+  exportReportCsv,
+  useChemicalUsageReport,
 } from "@/features/reports/services/reportService";
+import { chemicalUsageReportSchema } from "@/lib/schemas/reports";
+import { parseApiResponse } from "@/lib/api/parseApiResponse";
 import PageHeader from "@/shared/components/PageHeader";
 import { Download, FlaskConical } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 
 const ChemicalUsageReportPage = () => {
@@ -42,9 +44,34 @@ const ChemicalUsageReportPage = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = data as any;
-  const rows: any[] = Object.values(raw?.data?.usage ?? raw?.usage ?? {});
+  // Parse API response shape with Zod to avoid unsafe `as any` casts
+  const { parsedRows, hasParseError } = useMemo(() => {
+    let rowsResult: Array<{
+      chemical?: string | { common_name?: string | null };
+      total_used?: string | number;
+      unit?: string;
+      usage_count?: number;
+    }> = [];
+    let hasError = false;
+
+    if (!isLoading && data) {
+      try {
+        const parsed = parseApiResponse(chemicalUsageReportSchema, data);
+        rowsResult = Object.values(parsed.data?.usage ?? {});
+      } catch (err) {
+        hasError = true;
+      }
+    }
+    return { parsedRows: rowsResult, hasParseError: hasError };
+  }, [data, isLoading]);
+
+  useEffect(() => {
+    if (hasParseError) {
+      toast.error("Unexpected server response for chemical usage report");
+    }
+  }, [hasParseError]);
+
+  const rows = parsedRows;
 
   return (
     <AppLayout>
@@ -118,8 +145,7 @@ const ChemicalUsageReportPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                rows.map((row: any, i: number) => (
+                rows.map((row, i: number) => (
                   <TableRow key={i}>
                     <TableCell>
                       {typeof row.chemical === "string"

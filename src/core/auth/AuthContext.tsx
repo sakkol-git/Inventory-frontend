@@ -8,16 +8,21 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { api, clearToken, saveToken } from "@/core/api/api";
-import type { AuthProfileResponse, RegisterResponse } from "@/shared/types/index";
+import { reportError } from "@/lib/errors/reportError";
+import type {
+  AuthProfileResponse,
+  RegisterResponse,
+} from "@/shared/types/index";
 import type { LoginPayload, RegisterPayload } from "@/shared/types/schemas";
 import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-    type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
 } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ── Context Shape ─────────────────────────────────────────────────────────
 interface AuthContextValue {
@@ -37,13 +42,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthProfileResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
+  // Closes AUDIT #7 — Unhandled promise rejections (auth failures logged nowhere)
   const fetchProfile = useCallback(async () => {
     try {
       // /auth/profile returns { data: UserResource } — unwrap one level.
-      const { data } = await api.get<{ data: AuthProfileResponse }>("/auth/profile");
+      const { data } = await api.get<{ data: AuthProfileResponse }>(
+        "/auth/profile",
+      );
       setUser(data.data);
-    } catch {
+    } catch (err) {
+      // ✅ Report error for debugging instead of silent swallow
+      reportError(err, { context: "AuthContext.fetchProfile" });
       setUser(null);
     }
   }, []);
@@ -74,12 +85,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data;
   };
 
+  // Closes AUDIT #11 — Logout does not redirect
   const logout = async () => {
     try {
       await api.post("/auth/logout");
+    } catch (err) {
+      // ✅ Log logout failure but don't let it prevent local cleanup
+      reportError(err, { context: "AuthContext.logout" });
     } finally {
+      // ✅ Always clear local state and redirect, regardless of API success
       clearToken();
       setUser(null);
+      navigate("/login", { replace: true });
     }
   };
 

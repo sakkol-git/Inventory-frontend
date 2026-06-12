@@ -12,6 +12,7 @@ import {
     usePlantSampleList,
     useUpdatePlantSample,
 } from "@/features/inventory/services/plantSampleService";
+import { useUserList } from "@/features/inventory/services/userService";
 import { usePlantVarietyList } from "@/features/inventory/services/plantVarietyService";
 import type {
     PlantSampleApi,
@@ -45,13 +46,12 @@ export interface SampleForm {
   name: string;
   sampleCode: string;
   varietyId: string;
-  ownerName: string;
+  userId: string;
   department: string;
   originLocation: string;
   broughtAt: string;
   labLocation: string;
   status: string;
-  quantity: string;
   description: string;
   imageUrl: string;
 }
@@ -60,13 +60,12 @@ const EMPTY_FORM: SampleForm = {
   name: "",
   sampleCode: "",
   varietyId: "",
-  ownerName: "",
+  userId: "",
   department: "",
   originLocation: "",
   broughtAt: "",
   labLocation: "",
   status: "active",
-  quantity: "",
   description: "",
   imageUrl: "",
   
@@ -96,33 +95,42 @@ function formToPayload(form: SampleForm, imageFile: File | null): PlantSamplePay
     sample_name: form.name,
     sample_code: form.sampleCode,
     plant_variety_id: Number(form.varietyId),
-    owner_name: form.ownerName || null,
+    user_id: form.userId ? Number(form.userId) : null,
     department: form.department || null,
     origin_location: form.originLocation || null,
     brought_at: form.broughtAt || null,
     lab_location: (form.labLocation as LabLocation) || null,
     status: form.status as SampleStatus,
-    quantity: Number(form.quantity) || 0,
     description: form.description || null,
     image_url: form.imageUrl || null,
     ...(imageFile ? { image: imageFile } : {}),
   };
 }
 
-function sampleToForm(item: PlantSampleApi): SampleForm {
+function sampleToForm(
+  item: PlantSampleApi,
+  users: { id: number; name: string }[] = [],
+): SampleForm {
+  const matchedUserId =
+    item.relationships?.contributor?.id ??
+    item.details?.user_id ??
+    users.find((user) => user.name === item.details?.owner)?.id ??
+    users.find((user) => user.name === item.relationships?.contributor?.name)
+      ?.id ??
+    null;
+
   return {
     name: item.identity?.name ?? "",
     sampleCode: item.identity?.code ?? "",
     varietyId: item.relationships?.variety
       ? String(item.relationships.variety.id)
       : "",
-    ownerName: item.details?.owner ?? "",
+    userId: matchedUserId ? String(matchedUserId) : "",
     department: item.details?.department ?? "",
     originLocation: item.details?.origin ?? "",
     broughtAt: item.lab_info?.brought_at ?? "",
     labLocation: item.lab_info?.location ?? "",
     status: item.identity?.status ?? "active",
-    quantity: String(item.details?.quantity ?? 0),
     description: item.meta?.description ?? "",
     imageUrl: item.meta?.image ?? "",
   };
@@ -135,13 +143,12 @@ const PLANT_SAMPLE_FIELD_MAP: Record<string, keyof SampleForm> = {
   sample_name: "name",
   sample_code: "sampleCode",
   plant_variety_id: "varietyId",
-  owner_name: "ownerName",
+  user_id: "userId",
   department: "department",
   origin_location: "originLocation",
   brought_at: "broughtAt",
   lab_location: "labLocation",
   status: "status",
-  quantity: "quantity",
   description: "description",
   image_url: "imageUrl",
 };
@@ -166,6 +173,8 @@ export function usePlantSamplesView() {
     isError,
   } = usePlantSampleList(queryParams);
 
+  const { data: userResponse } = useUserList({ per_page: 100 });
+
   const rawItems = response?.data ?? [];
   const meta = response?.meta;
   const items: SampleItem[] = rawItems
@@ -176,6 +185,9 @@ export function usePlantSamplesView() {
   // ── Variety list for dropdown ──
   const { data: varietyResponse } = usePlantVarietyList({ per_page: 100 });
   const varieties = varietyResponse?.data ?? [];
+  const users = (userResponse?.data ?? []).slice().sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   // ── Mutations ──
   const createMutation = useCreatePlantSample();
@@ -246,7 +258,7 @@ export function usePlantSamplesView() {
 
   const openEditForm = (item: SampleItem) => {
     form.reset();
-    Object.entries(sampleToForm(item)).forEach(([key, value]) => {
+    Object.entries(sampleToForm(item, users)).forEach(([key, value]) => {
       form.updateField(key as keyof SampleForm, value);
     });
     imageUpload.setInitialUrl(item.meta.image || "");
@@ -286,6 +298,7 @@ export function usePlantSamplesView() {
     filteredItems,
     stats,
     varieties,
+    users,
     openCreateForm,
     openEditForm,
     deleteDialog,

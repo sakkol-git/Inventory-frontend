@@ -11,8 +11,9 @@
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 import { useAuth } from "@/core/auth/useAuth";
+import { Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -34,11 +35,18 @@ export function ProtectedRoute({
   unauthorizedRedirectTo = "/inventory",
 }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, hasPermission, isRole } = useAuth();
+  const location = useLocation();
 
-  if (isLoading) return null; // Wait for auth to resolve
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={redirectTo} state={{ from: location.pathname }} replace />;
   }
 
   if (permission && !hasPermission(permission)) {

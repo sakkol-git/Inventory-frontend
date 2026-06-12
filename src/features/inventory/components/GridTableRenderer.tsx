@@ -16,16 +16,16 @@ export interface GridTableRendererProps<T> {
   isEmpty: boolean;
 
   /** Grid view component */
-  GridComponent: React.ComponentType<any>;
+  GridComponent: React.ComponentType<Record<string, unknown>>;
 
   /** Table view component */
-  TableComponent: React.ComponentType<any>;
+  TableComponent: React.ComponentType<Record<string, unknown>>;
 
   /** Props to pass to grid component */
-  gridProps?: Record<string, any>;
+  gridProps?: Record<string, unknown>;
 
   /** Props to pass to table component */
-  tableProps?: Record<string, any>;
+  tableProps?: Record<string, unknown>;
 
   /** Empty state view */
   emptyState: React.ReactNode;

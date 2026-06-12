@@ -7,6 +7,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { handleFormError } from "@/lib/errors/handleFormError";
 
 type AssignmentUserView = {
   id: number;
@@ -95,7 +96,7 @@ export function useAchievementsView() {
       description: achievement.description ?? undefined,
       criteria_type: achievement.criteria_type,
       criteria_value: achievement.criteria_value,
-      icon: achievement.icon ?? undefined,
+      image_url: achievement.icon ?? undefined,
     });
   };
 
@@ -130,8 +131,7 @@ export function useAchievementsView() {
       toast.success("Achievement created");
       closeCreateForm();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to create");
+      handleFormError(err, createForm, "Failed to create");
     }
   });
 
@@ -142,8 +142,7 @@ export function useAchievementsView() {
       toast.success("Achievement updated");
       closeEditForm();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to update");
+      handleFormError(err, editForm, "Failed to update");
     }
   });
 

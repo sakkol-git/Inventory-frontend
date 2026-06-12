@@ -2,6 +2,7 @@ import MobileBottomNav from "@/core/layouts/MobileBottomNav";
 import { Breadcrumbs } from "@/shared/components/Breadcrumbs";
 import CommandPalette from "@/shared/components/CommandPalette";
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
+import { OfflineBanner } from "@/shared/components/OfflineBanner";
 import KeyboardShortcutsPanel from "@/shared/components/KeyboardShortcutsPanel";
 import PageTransition from "@/shared/components/PageTransition";
 import { useKeyboardShortcuts } from "@/shared/hooks/useKeyboardShortcuts";
@@ -52,6 +53,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   return (
     <SidebarContext.Provider value={{ mobileOpen, setMobileOpen }}>
       <div className="min-h-screen bg-background">
+        <OfflineBanner />
         <CommandPalette />
         <KeyboardShortcutsPanel
           open={shortcutsOpen}

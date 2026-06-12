@@ -5,22 +5,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { PermissionGate } from "@/core/auth/PermissionGate";
 import AppLayout from "@/core/layouts/AppLayout";
 import {
-    exportReportCsv,
-    useBorrowedItemsReport,
+  exportReportCsv,
+  useBorrowedItemsReport,
 } from "@/features/reports/services/reportService";
+import { borrowedItemsReportSchema } from "@/lib/schemas/reports";
+import { parseApiResponse } from "@/lib/api/parseApiResponse";
 import PageHeader from "@/shared/components/PageHeader";
 import { ArrowLeftRight, Download } from "lucide-react";
 import { toast } from "sonner";
+import { useMemo, useEffect } from "react";
 
 const statusVariant = (status: string) => {
   if (status === "overdue") return "destructive";
@@ -41,10 +44,46 @@ const BorrowedItemsReportPage = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw = data as any;
-  const summary = raw?.data ?? {};
-  const items: any[] = Array.isArray(summary.records) ? summary.records : [];
+  // Parse API response with Zod to remove `as any` usages
+  const { parsedItems, parsedSummary, hasParseError } = useMemo(() => {
+    let parsedItemsResult: Array<{
+      user?: string | { name?: string };
+      borrowable_type?: string;
+      borrowable_id?: number | string;
+      quantity?: number;
+      due_at?: string | null;
+      status: string;
+    }> = [];
+    let parsedSummaryResult: {
+      total?: number;
+      active?: number;
+      pending?: number;
+      overdue?: number;
+      records?: typeof parsedItemsResult;
+    } = {};
+    let hasError = false;
+
+    if (!isLoading && data) {
+      try {
+        const parsed = parseApiResponse(borrowedItemsReportSchema, data);
+        parsedSummaryResult = parsed.data?.summary ?? {};
+        parsedItemsResult = Array.isArray(parsedSummaryResult.records) ? parsedSummaryResult.records : [];
+      } catch (err) {
+        hasError = true;
+      }
+    }
+
+    return { parsedItems: parsedItemsResult, parsedSummary: parsedSummaryResult, hasParseError: hasError };
+  }, [data, isLoading]);
+
+  useEffect(() => {
+    if (hasParseError) {
+      toast.error("Unexpected server response for borrowed items report");
+    }
+  }, [hasParseError]);
+
+  const items = parsedItems;
+  const summary = parsedSummary;
 
   return (
     <AppLayout>
@@ -111,8 +150,7 @@ const BorrowedItemsReportPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                items.map((item: any, i: number) => (
+                items.map((item, i: number) => (
                   <TableRow key={i}>
                     <TableCell>
                       {typeof item.user === "object"

@@ -1,52 +1,46 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// Login Page — Enhanced with branded sidebar layout.
-// Phase 10.1 — Auth page enhancements.
-// ═══════════════════════════════════════════════════════════════════════════
-
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/core/auth/useAuth";
 import { loginSchema, type LoginPayload } from "@/shared/types/schemas";
+import { handleFormError } from "@/lib/errors/handleFormError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Sprout } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const form = useForm<LoginPayload>({
+    resolver: zodResolver(loginSchema),
+  });
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginPayload>({
-    resolver: zodResolver(loginSchema),
-  });
+  } = form;
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       await login(data);
       toast.success("Welcome back!");
-      navigate("/inventory", { replace: true });
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryFrom = urlParams.get("from");
+      const from = (location.state as { from?: string })?.from || queryFrom || "/inventory";
+      navigate(from, { replace: true });
     } catch (err: unknown) {
-      const error = err as {
-        response?: { data?: { error?: string; message?: string } };
-      };
-      toast.error(
-        error.response?.data?.error ||
-          error.response?.data?.message ||
-          "Invalid credentials",
-      );
+      handleFormError(err, form, "Invalid credentials");
     }
   });
 

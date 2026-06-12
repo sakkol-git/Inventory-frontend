@@ -7,6 +7,7 @@ import { CheckCircle, Clock, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { handleFormError } from "@/lib/errors/handleFormError";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,8 +67,7 @@ const PendingApprovals = () => {
       toast.success("Borrow request approved");
       setApproveItem(null);
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to approve");
+      handleFormError(err, approveForm, "Failed to approve");
     }
   });
 
@@ -78,8 +78,7 @@ const PendingApprovals = () => {
       toast.success("Borrow request rejected");
       setRejectItem(null);
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to reject");
+      handleFormError(err, rejectForm, "Failed to reject");
     }
   });
 

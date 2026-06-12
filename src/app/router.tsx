@@ -9,6 +9,7 @@
 
 import { ProtectedRoute } from "@/core/auth";
 import { useAuth } from "@/core/auth/useAuth";
+import { RedirectWithParams } from "@/core/components/RedirectWithParams";
 import { lazyRoute } from "@/shared/lib/lazy-routes";
 import { Navigate, Route, Routes } from "react-router-dom";
 
@@ -47,6 +48,10 @@ const PermissionManagement = lazyRoute(
 const ActivityLog = lazyRoute(
   () => import("@/features/admin/pages/ActivityLog"),
   { displayName: "ActivityLog" },
+);
+const ChemicalUsageLogs = lazyRoute(
+  () => import("@/features/admin/pages/ChemicalUsageLogs"),
+  { displayName: "ChemicalUsageLogs" },
 );
 
 // ─── Inventory: Listings ─────────────────────────────────────────────────────
@@ -486,6 +491,14 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/admin/chemical-usage-logs"
+        element={
+          <Protected requiredRole="admin">
+            <ChemicalUsageLogs />
+          </Protected>
+        }
+      />
+      <Route
         path="/admin/permissions"
         element={
           <Protected requiredRole="admin">
@@ -529,19 +542,19 @@ export default function AppRoutes() {
       />
       <Route
         path="/products/species/:id"
-        element={<Navigate to="/inventory/products/species/:id" replace />}
+        element={<RedirectWithParams to="/inventory/plant-species/:id" />}
       />
       <Route
         path="/products/batches/:id"
-        element={<Navigate to="/inventory/products/stock/:id" replace />}
+        element={<RedirectWithParams to="/inventory/plant-stock/:id" />}
       />
       <Route
         path="/products/chemicals/:id"
-        element={<Navigate to="/inventory/products/chemicals/:id" replace />}
+        element={<RedirectWithParams to="/inventory/chemicals/:id" />}
       />
       <Route
         path="/products/equipment/:id"
-        element={<Navigate to="/inventory/products/equipment/:id" replace />}
+        element={<RedirectWithParams to="/inventory/equipment/:id" />}
       />
       <Route
         path="/inventory/products/equipment"

@@ -5,8 +5,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle, Pencil, Plus, Trash2, Wrench } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
+import { handleFormError } from "@/lib/errors/handleFormError";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -86,8 +87,7 @@ const MaintenanceRecords = () => {
       setCreateOpen(false);
       createForm.reset();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to create record");
+      handleFormError(err, createForm, "Failed to create record");
     }
   });
 
@@ -98,8 +98,7 @@ const MaintenanceRecords = () => {
       toast.success("Maintenance record updated");
       setEditItem(null);
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error.response?.data?.message ?? "Failed to update record");
+      handleFormError(err, editForm, "Failed to update record");
     }
   });
 
@@ -302,8 +301,7 @@ const MaintenanceRecords = () => {
 };
 
 // ── Shared Form Fields ────────────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const MaintenanceFormFields = ({ form }: { form: any }) => {
+const MaintenanceFormFields = ({ form }: { form: UseFormReturn<StoreMaintenanceRecordPayload> }) => {
   const {
     register,
     setValue,

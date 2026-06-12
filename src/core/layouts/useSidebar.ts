@@ -158,6 +158,12 @@ const INVENTORY_NAV: NavItem[] = [
     matchPaths: ["/admin/activity-log"],
   },
   {
+    title: "Chemical Usage Logs",
+    url: "/admin/chemical-usage-logs",
+    icon: FileText,
+    matchPaths: ["/admin/chemical-usage-logs"],
+  },
+  {
     title: "My Profile",
     url: "/inventory/profile",
     icon: User,
@@ -212,6 +218,7 @@ const INVENTORY_GROUPS: NavGroup[] = [
         "Roles",
         "Permissions",
         "Activity Log",
+        "Chemical Usage Logs",
         "Transactions",
         "My Profile",
       ].includes(n.title),

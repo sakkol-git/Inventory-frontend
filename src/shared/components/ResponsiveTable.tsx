@@ -68,6 +68,12 @@ export function ResponsiveTable<T extends Record<string, unknown>>({
                 onRowClick && "cursor-pointer hover-lift",
               )}
               onClick={() => onRowClick?.(row)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onRowClick?.(row);
+                }
+              }}
               role={onRowClick ? "button" : undefined}
               tabIndex={onRowClick ? 0 : undefined}
             >
@@ -138,6 +144,13 @@ export function ResponsiveTable<T extends Record<string, unknown>>({
                 key={key}
                 className={cn(onRowClick && "cursor-pointer")}
                 onClick={() => onRowClick?.(row)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onRowClick?.(row);
+                  }
+                }}
+                tabIndex={onRowClick ? 0 : undefined}
               >
                 {columns.map((col) => (
                   <td key={col.key}>

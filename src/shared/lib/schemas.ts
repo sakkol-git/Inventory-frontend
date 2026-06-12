@@ -59,7 +59,7 @@ export const plantSampleSchema = z.object({
     .int()
     .positive(),
   plant_variety_id: z.number().int().positive().nullable().optional(),
-  owner_name: z.string().nullable().optional(),
+  user_id: z.number().int().positive().nullable().optional(),
   department: z.string().nullable().optional(),
   origin_location: z.string().nullable().optional(),
   brought_at: z.string().nullable().optional(),
@@ -68,7 +68,6 @@ export const plantSampleSchema = z.object({
     .nullable()
     .optional(),
   status: z.enum(["active", "inactive", "archived"]),
-  quantity: z.number({ required_error: "Quantity is required" }).int().min(0),
   description: z.string().nullable().optional(),
   image_url: z
     .string()

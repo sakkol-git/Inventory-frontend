@@ -15,12 +15,13 @@ import { useAuth } from "@/core/auth/useAuth";
 import { getGreeting } from "@/shared/lib/greeting";
 import { Clock } from "lucide-react";
 import type {
-    DashboardHeader,
-    DashboardTab,
-    InventoryDashboardConfig,
-    InventoryWidget,
+  DashboardHeader,
+  DashboardTab,
+  InventoryDashboardConfig,
+  InventoryWidget,
 } from "./types";
 import { WIDGET_REGISTRY } from "./widgetRegistry";
+import { WidgetErrorBoundary } from "@/components/errors/WidgetErrorBoundary";
 
 // ─── Exhaustiveness Guard ──────────────────────────────────────────────────
 
@@ -46,7 +47,11 @@ const WidgetSlot = ({ widget }: WidgetSlotProps) => {
     const Renderer = WIDGET_REGISTRY[type] as React.ComponentType<{
       config: typeof widget;
     }>;
-    return <Renderer config={widget} />;
+    return (
+      <WidgetErrorBoundary>
+        <Renderer config={widget} />
+      </WidgetErrorBoundary>
+    );
   }
 
   return assertNever(type as never);

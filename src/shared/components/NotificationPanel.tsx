@@ -245,6 +245,14 @@ export function NotificationPanel() {
                       isUnread && "bg-primary/5",
                     )}
                     onClick={() => isUnread && markAsRead(notification.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (isUnread) {
+                          markAsRead(notification.id);
+                        }
+                      }
+                    }}
                     role="button"
                     tabIndex={0}
                   >

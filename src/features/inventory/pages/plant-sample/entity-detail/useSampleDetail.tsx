@@ -47,6 +47,11 @@ function formatDate(iso: string | null | undefined): string {
   });
 }
 
+function formatQuantity(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  return value.toLocaleString();
+}
+
 // ─── Config Assembly (pure transform) ──────────────────────────────────────
 
 function assembleConfig(data: PlantSampleApi): SamplePageConfig {
@@ -54,12 +59,14 @@ function assembleConfig(data: PlantSampleApi): SamplePageConfig {
   const color = statusColor(status);
   const badgeClass = statusBadgeClass(status);
 
-  const speciesName =
-    data.relationships.species?.common_name ||
-    data.relationships.species?.scientific_name ||
-    "—";
+  const species =
+    data.relationships.species ?? data.relationships.variety?.plant_species ?? null;
+
+  const speciesName = species?.common_name || species?.scientific_name || "—";
 
   const varietyName = data.relationships.variety?.name || null;
+  const contributorName = data.relationships.contributor?.name || null;
+  const linkedStocks = data.relationships.stocks?.length ?? 0;
 
   return {
     header: {
@@ -105,14 +112,14 @@ function assembleConfig(data: PlantSampleApi): SamplePageConfig {
       },
       {
         label: "Quantity",
-        value: data.details.quantity.toLocaleString(),
+        value: formatQuantity(data.details.quantity),
         icon: Package,
         color: "hsl(38, 92%, 50%)",
       },
     ],
 
     actions: buildActions(
-      data.relationships.species?.id ?? null,
+      species?.id ?? null,
       data.relationships.variety?.id ?? null,
     ),
 
@@ -147,11 +154,14 @@ function assembleConfig(data: PlantSampleApi): SamplePageConfig {
         ? [
             {
               kind: "ownership" as const,
-              title: "Ownership & Department",
+              title: "User & Department",
               icon: User,
               fields: [
+                ...(contributorName
+                  ? [{ label: "Contributor", value: contributorName }]
+                  : []),
                 ...(data.details.owner
-                  ? [{ label: "Owner", value: data.details.owner }]
+                  ? [{ label: "User", value: data.details.owner }]
                   : []),
                 ...(data.details.department
                   ? [{ label: "Department", value: data.details.department }]
@@ -166,7 +176,10 @@ function assembleConfig(data: PlantSampleApi): SamplePageConfig {
         title: "Storage & Inventory",
         icon: Thermometer,
         fields: [
-          { label: "Quantity", value: data.details.quantity.toLocaleString() },
+          { label: "Quantity", value: formatQuantity(data.details.quantity) },
+          ...(linkedStocks
+            ? [{ label: "Linked Stocks", value: String(linkedStocks) }]
+            : []),
           ...(data.lab_info.location
             ? [{ label: "Lab Location", value: data.lab_info.location }]
             : []),

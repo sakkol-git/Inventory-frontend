@@ -34,8 +34,7 @@ interface ExportColumn {
 }
 
 interface ExportButtonProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any[];
+  data: Record<string, unknown>[];
   filename: string;
   columns: ExportColumn[];
   className?: string;
@@ -46,10 +45,14 @@ function getCellValue(row: Record<string, unknown>, col: ExportColumn): string {
     return String(col.getValue(row) ?? "");
   }
   const keys = col.key.split(".");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let val: any = row;
+  let val: unknown = row;
   for (const k of keys) {
-    val = val?.[k];
+    if (val != null && typeof val === "object") {
+      val = (val as Record<string, unknown>)[k];
+    } else {
+      val = undefined;
+      break;
+    }
   }
   return val == null ? "" : String(val);
 }

@@ -157,25 +157,6 @@ export interface Chemical {
   updated_at: string;
 }
 
-// ── Chemical Batch ────────────────────────────────────────────────────────
-export interface ChemicalBatch {
-  id: number;
-  chemical_id: number;
-  batch_number: string;
-  quantity: number;
-  remaining_quantity: number;
-  unit: string;
-  expiry_date: string | null;
-  is_expired: boolean;
-  supplier_name: string | null;
-  supplier_contact: string | null;
-  received_at: string | null;
-  cost_per_unit: number | null;
-  notes: string | null;
-  chemical?: Chemical;
-  created_at: string;
-  updated_at: string;
-}
 
 // ── Chemical Usage Log ────────────────────────────────────────────────────
 export interface ChemicalUsageLog {
@@ -189,7 +170,6 @@ export interface ChemicalUsageLog {
   notes: string | null;
   user: { id: number; name: string } | Record<string, never>;
   chemical?: Chemical;
-  batch?: ChemicalBatch;
   created_at: string;
 }
 

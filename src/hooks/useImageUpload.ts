@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 /**
  * Result from useImageUpload hook
@@ -12,6 +12,9 @@ export interface UseImageUploadResult {
 
   /** Original URL (from server) */
   imageUrl: string;
+
+  /** File size validation error (if any) */
+  validationError: string | null;
 
   /** Set image from file */
   handleImageChange: (file: File | null) => void;
@@ -36,6 +39,8 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
  * Generic hook for managing image upload state
  * Handles file selection, preview generation, and validation
  *
+ * Closes AUDIT #2 — FileReader memory leak + unmount-safe state updates
+ *
  * @example
  * const image = useImageUpload();
  *
@@ -46,6 +51,9 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
  *       accept="image/*"
  *       onChange={(e) => image.handleImageChange(e.target.files?.[0] ?? null)}
  *     />
+ *     {image.validationError && (
+ *       <p className="text-destructive text-sm">{image.validationError}</p>
+ *     )}
  *     {image.imagePreviewUrl && (
  *       <img src={image.imagePreviewUrl} alt="Preview" />
  *     )}
@@ -54,49 +62,111 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
  */
 export function useImageUpload(initialUrl?: string): UseImageUploadResult {
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>(initialUrl ?? "");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>(
+    initialUrl ?? "",
+  );
   const [imageUrl, setImageUrl] = useState<string>(initialUrl ?? "");
   const [initialImageUrl] = useState<string>(initialUrl ?? "");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // ✅ Guard: Track component mount state to prevent setState after unmount
+  const mountedRef = useRef(true);
+
+  // ✅ Guard: Track active FileReader to abort on unmount
+  const readerRef = useRef<FileReader | null>(null);
+
+  // ✅ Cleanup: Abort FileReader and mark unmounted on component unmount
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      // If a FileReader is in progress, abort it
+      if (
+        readerRef.current &&
+        readerRef.current.readyState === FileReader.LOADING
+      ) {
+        readerRef.current.abort();
+      }
+    };
+  }, []);
 
   const handleImageChange = useCallback((file: File | null) => {
     if (!file) {
       setImageFile(null);
       setImagePreviewUrl("");
+      setValidationError(null);
       return;
     }
 
-    // Validate file size
+    // ✅ Validate file size and return error message (not silent console.error)
     if (file.size > MAX_FILE_SIZE) {
-      console.error("File too large. Maximum size is 5MB.");
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const limitMB = (MAX_FILE_SIZE / (1024 * 1024)).toFixed(0);
+      setValidationError(
+        `Image too large (${sizeMB}MB). Maximum is ${limitMB}MB.`,
+      );
+      setImageFile(null);
+      setImagePreviewUrl("");
       return;
     }
 
-    // Validate file type
+    // ✅ Validate file type and return error message (not silent console.error)
     if (!ALLOWED_TYPES.includes(file.type)) {
-      console.error("Invalid file type. Allowed types: JPEG, PNG, WebP, GIF.");
+      setValidationError("Invalid file type. Allowed: JPEG, PNG, WebP, GIF.");
+      setImageFile(null);
+      setImagePreviewUrl("");
       return;
     }
 
+    // Clear previous validation errors
+    setValidationError(null);
     setImageFile(file);
 
-    // Generate preview URL
+    // ✅ Generate preview URL via FileReader with error handling
     const reader = new FileReader();
+    readerRef.current = reader;
+
     reader.onload = (e) => {
+      // ✅ Guard: Only setState if component is still mounted
+      if (!mountedRef.current) return;
+
       const result = e.target?.result as string;
       setImagePreviewUrl(result);
     };
+
+    // ✅ Error handler: If FileReader fails, capture the error
+    reader.onerror = () => {
+      if (!mountedRef.current) return;
+      setValidationError("Failed to read file. Please try again.");
+    };
+
+    // ✅ Add timeout: Prevent hanging on very large files or slow I/O
+    const timeoutId = setTimeout(() => {
+      if (reader.readyState === FileReader.LOADING) {
+        reader.abort();
+        if (mountedRef.current) {
+          setValidationError("File read timed out. Please try a smaller file.");
+        }
+      }
+    }, 10000); // 10 second timeout
+
+    reader.onloadend = () => {
+      clearTimeout(timeoutId);
+    };
+
     reader.readAsDataURL(file);
   }, []);
 
   const setInitialUrl = useCallback((url: string) => {
     setImageUrl(url);
     setImagePreviewUrl(url);
+    setValidationError(null);
   }, []);
 
   const clearImage = useCallback(() => {
     setImageFile(null);
     setImagePreviewUrl("");
     setImageUrl("");
+    setValidationError(null);
   }, []);
 
   const hasChanged = useCallback(() => {
@@ -107,6 +177,7 @@ export function useImageUpload(initialUrl?: string): UseImageUploadResult {
     imageFile,
     imagePreviewUrl: imagePreviewUrl || imageUrl,
     imageUrl,
+    validationError,
     handleImageChange,
     setImageUrl,
     clearImage,

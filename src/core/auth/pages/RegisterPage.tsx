@@ -5,19 +5,21 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/core/auth/useAuth";
 import { PasswordStrengthMeter } from "@/shared/components/PasswordStrengthMeter";
 import { registerSchema, type RegisterPayload } from "@/shared/types/schemas";
+import { handleFormError } from "@/lib/errors/handleFormError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Sprout } from "lucide-react";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -26,14 +28,15 @@ export default function RegisterPage() {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
 
+  const form = useForm<RegisterPayload>({
+    resolver: zodResolver(registerSchema),
+  });
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterPayload>({
-    resolver: zodResolver(registerSchema),
-  });
+  } = form;
 
   const passwordValue = watch("password", "");
 
@@ -43,22 +46,7 @@ export default function RegisterPage() {
       toast.success("Account created successfully!");
       navigate("/inventory", { replace: true });
     } catch (err: unknown) {
-      const error = err as {
-        response?: {
-          status?: number;
-          data?: {
-            message?: string;
-            errors?: Record<string, string[]>;
-          };
-        };
-      };
-      if (error.response?.status === 422 && error.response.data?.errors) {
-        Object.entries(error.response.data.errors).forEach(([, messages]) => {
-          toast.error((messages as string[])[0]);
-        });
-      } else {
-        toast.error(error.response?.data?.message || "Registration failed");
-      }
+      handleFormError(err, form, "Registration failed");
     }
   });
 

@@ -6,6 +6,7 @@ import { api } from "@/core/api/api";
 import type { ApiResponse, ChemicalUsageLog } from "@/shared/types/index";
 import type { StoreChemicalUsageLogPayload } from "@/shared/types/schemas";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { chemicalKeys } from "@/features/inventory/services/chemicalService";
 
 const QUERY_KEY = ["chemical-usage-logs"] as const;
 
@@ -43,6 +44,44 @@ export const useCreateChemicalUsageLog = () => {
       );
       return data.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      // Also refresh chemicals cache so updated quantities appear in UI
+      queryClient.invalidateQueries({ queryKey: chemicalKeys.all });
+    },
+  });
+};
+
+export const useUseChemical = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: StoreChemicalUsageLogPayload) => {
+      const { data } = await api.post<ApiResponse<ChemicalUsageLog>>(
+        "/chemical-usage-logs/use",
+        payload,
+      );
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: chemicalKeys.all });
+    },
+  });
+};
+
+export const useAddChemical = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: StoreChemicalUsageLogPayload) => {
+      const { data } = await api.post<ApiResponse<ChemicalUsageLog>>(
+        "/chemical-usage-logs/add",
+        payload,
+      );
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: chemicalKeys.all });
+    },
   });
 };

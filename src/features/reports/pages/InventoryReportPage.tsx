@@ -7,49 +7,51 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { PermissionGate } from "@/core/auth/PermissionGate";
 import AppLayout from "@/core/layouts/AppLayout";
 import {
-    exportReportCsv,
-    useInventoryReport,
+  exportReportCsv,
+  useInventoryReport,
 } from "@/features/reports/services/reportService";
 import PageHeader from "@/shared/components/PageHeader";
 import { cn } from "@/shared/lib/utils";
 import {
-    AlertTriangle,
-    BarChart3,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    ChevronUp,
-    ChevronsUpDown,
-    Download,
-    Search,
-    X,
+  AlertTriangle,
+  BarChart3,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronsUpDown,
+  Download,
+  Search,
+  X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
+import { parseApiResponse } from "@/lib/api/parseApiResponse";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 type SortDir = "asc" | "desc" | null;
@@ -139,7 +141,20 @@ const COLUMNS: Record<string, ColDef[]> = {
   plant_samples: [
     { key: "sample_name", label: "Name", sortable: true },
     { key: "sample_code", label: "Code" },
-    { key: "owner_name", label: "Owner", sortable: true },
+    {
+      key: "owner_name",
+      label: "User",
+      sortable: true,
+      render: (r) => {
+        const userName = nest(r, "user.name");
+        if (userName !== "—") return userName;
+
+        const ownerName = nest(r, "owner_name");
+        if (ownerName !== "—") return ownerName;
+
+        return nest(r, "user_id");
+      },
+    },
     { key: "quantity", label: "Qty", sortable: true },
     { key: "status", label: "Status", sortable: true },
     { key: "lab_location", label: "Location" },
@@ -208,19 +223,60 @@ const InventoryReportPage = () => {
     page,
     per_page: 25,
   });
+  // Parse and validate API response shape for inventory report (lenient)
+  const { parsedItems, parsedMeta, hasParseError } = useMemo(() => {
+    let itemsResult: Record<string, unknown>[] = data?.data ?? [];
+    let metaResult = data?.meta;
+    let hasError = false;
+
+    if (!isLoading && data) {
+      try {
+        const inventorySchema = z.object({
+          data: z.array(z.record(z.any())).default([]),
+          meta: z
+            .object({
+              from: z.number().nullable(),
+              to: z.number().nullable(),
+              total: z.number(),
+              last_page: z.number(),
+              current_page: z.number(),
+              per_page: z.number(),
+            })
+            .optional(),
+        });
+
+        const parsed = parseApiResponse(inventorySchema, data);
+        itemsResult = parsed.data ?? [];
+        metaResult = parsed.meta ?? metaResult;
+      } catch (err) {
+        hasError = true;
+        itemsResult = data?.data ?? [];
+        metaResult = data?.meta;
+      }
+    }
+    return { parsedItems: itemsResult, parsedMeta: metaResult, hasParseError: hasError };
+  }, [data, isLoading]);
+
+  useEffect(() => {
+    if (hasParseError) {
+      toast.error("Unexpected server response for inventory report");
+    }
+  }, [hasParseError]);
+
+  const meta = parsedMeta;
 
   // Client-side search + sort on top of the current page
   const filtered = useMemo(() => {
-    const items = data?.data ?? [];
+    const items = parsedItems;
     const q = search.trim().toLowerCase();
     let rows = q
       ? items.filter((r) =>
-          Object.values(r).some((v) =>
-            String(v ?? "")
-              .toLowerCase()
-              .includes(q),
-          ),
-        )
+        Object.values(r).some((v) =>
+          String(v ?? "")
+            .toLowerCase()
+            .includes(q),
+        ),
+      )
       : items;
 
     if (sort.key && sort.dir) {
@@ -232,9 +288,9 @@ const InventoryReportPage = () => {
       });
     }
     return rows;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.data, search, sort]);
 
-  const meta = data?.meta;
   const cols = COLUMNS[section] ?? COLUMNS.chemicals;
 
   const toggleSort = (key: string) =>
@@ -339,7 +395,7 @@ const InventoryReportPage = () => {
                     key={col.key}
                     className={cn(
                       col.sortable &&
-                        "cursor-pointer select-none hover:text-foreground",
+                      "cursor-pointer select-none hover:text-foreground",
                     )}
                     onClick={() => col.sortable && toggleSort(col.key)}
                   >
@@ -377,11 +433,11 @@ const InventoryReportPage = () => {
                   const rowCn = cn(
                     danger === "high" && "bg-red-50 dark:bg-red-950/40",
                     danger === "medium" &&
-                      !isLowStock(item) &&
-                      "bg-amber-50 dark:bg-amber-950/30",
+                    !isLowStock(item) &&
+                    "bg-amber-50 dark:bg-amber-950/30",
                     isLowStock(item) &&
-                      danger !== "high" &&
-                      "bg-yellow-50 dark:bg-yellow-950/30",
+                    danger !== "high" &&
+                    "bg-yellow-50 dark:bg-yellow-950/30",
                   );
 
                   return (
@@ -401,8 +457,8 @@ const InventoryReportPage = () => {
                             <span
                               className={cn(
                                 isLowStock(item) &&
-                                  col.key === "quantity" &&
-                                  "font-semibold text-amber-600 dark:text-amber-400",
+                                col.key === "quantity" &&
+                                "font-semibold text-amber-600 dark:text-amber-400",
                               )}
                             >
                               {String(item[col.key] ?? "—")}
@@ -415,7 +471,7 @@ const InventoryReportPage = () => {
                               <span
                                 className={cn(
                                   new Date(String(item[col.key])) <
-                                    new Date() && "text-red-600 font-medium",
+                                  new Date() && "text-red-600 font-medium",
                                 )}
                               >
                                 {String(item[col.key]).slice(0, 10)}

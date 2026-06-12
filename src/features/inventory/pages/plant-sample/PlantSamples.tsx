@@ -99,7 +99,7 @@ const PlantSamples = () => {
           <SearchFilter
             query={view.searchQuery}
             onQueryChange={view.setSearchQuery}
-            placeholder="Search samples by name, code, species, owner..."
+            placeholder="Search samples by name, code, species, user..."
           />
           <div className="flex items-center gap-2">
             <Select
@@ -128,7 +128,7 @@ const PlantSamples = () => {
                 { key: "identity.status", label: "Status" },
                 { key: "details.quantity", label: "Quantity" },
                 { key: "lab_info.location", label: "Storage" },
-                { key: "details.owner", label: "Owner" },
+                { key: "details.owner", label: "User" },
               ]}
             />
           </div>
@@ -203,7 +203,12 @@ const PlantSamples = () => {
                           icon: User,
                           value: item.details.owner,
                         }
-                      : null,
+                      : item.relationships.contributor?.name
+                        ? {
+                            icon: User,
+                            value: item.relationships.contributor.name,
+                          }
+                        : null,
                     item.details.origin
                       ? { icon: MapPin, value: item.details.origin }
                       : null,
@@ -231,7 +236,7 @@ const PlantSamples = () => {
                   <TableHead>Species</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Storage</TableHead>
-                  <TableHead>Owner</TableHead>
+                  <TableHead>User</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -257,7 +262,7 @@ const PlantSamples = () => {
                         : "—"}
                     </TableCell>
                     <TableCell className="text-sm">
-                      {item.details.owner ?? "—"}
+                      {item.details.owner ?? item.relationships.contributor?.name ?? "—"}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -315,7 +320,6 @@ const PlantSamples = () => {
               <Label>Name *</Label>
               <Input
                 id="sample-name"
-                autoFocus
                 value={view.form.form.name}
                 onChange={(e) =>
                   view.form.updateField('name', e.target.value)
@@ -355,17 +359,6 @@ const PlantSamples = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Quantity *</Label>
-                <Input
-                  type="number"
-                  value={view.form.form.quantity}
-                  onChange={(e) =>
-                    view.form.updateField('quantity', e.target.value)
-                  }
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-1.5">
                 <Label>Lab Location</Label>
                 <Select
                   value={view.form.form.labLocation}
@@ -388,16 +381,22 @@ const PlantSamples = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Owner Name</Label>
-                <Input
-                  value={view.form.form.ownerName}
-                  onChange={(e) =>
-                    view.form.updateField(
-                      'ownerName',
-                      e.target.value,
-                    )
-                  }
-                />
+                <Label>User *</Label>
+                <Select
+                  value={view.form.form.userId}
+                  onValueChange={(v) => view.form.updateField('userId', v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {view.users.map((user) => (
+                      <SelectItem key={user.id} value={String(user.id)}>
+                        {user.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-1.5">
                 <Label>Department</Label>
@@ -476,7 +475,10 @@ const PlantSamples = () => {
             <Button variant="outline" onClick={() => view.setDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={view.form.submit}>
+            <Button
+              onClick={view.form.submit}
+              disabled={!view.form.form.name || !view.form.form.varietyId || !view.form.form.userId || view.form.isSubmitting}
+            >
               {view.editingId ? "Update" : "Create"}
             </Button>
           </DialogFooter>

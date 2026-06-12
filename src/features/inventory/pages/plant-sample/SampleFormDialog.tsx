@@ -98,20 +98,6 @@ export const SampleFormDialog = ({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Quantity *</Label>
-            <Input
-              type="number"
-              value={view.form.form.quantity}
-              onChange={(e) =>
-                view.form.updateField("quantity", e.target.value)
-              }
-              placeholder="0"
-            />
-            {view.form.errors.quantity && (
-              <p className="text-xs text-destructive">{view.form.errors.quantity}</p>
-            )}
-          </div>
-          <div className="space-y-1.5">
             <Label>Lab Location</Label>
             <Select
               value={view.form.form.labLocation}
@@ -137,15 +123,24 @@ export const SampleFormDialog = ({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label>Owner Name</Label>
-            <Input
-              value={view.form.form.ownerName}
-              onChange={(e) =>
-                view.form.updateField("ownerName", e.target.value)
-              }
-            />
-            {view.form.errors.ownerName && (
-              <p className="text-xs text-destructive">{view.form.errors.ownerName}</p>
+            <Label>User *</Label>
+            <Select
+              value={view.form.form.userId}
+              onValueChange={(v) => view.form.updateField("userId", v)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select user" />
+              </SelectTrigger>
+              <SelectContent>
+                {view.users.map((user) => (
+                  <SelectItem key={user.id} value={String(user.id)}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {view.form.errors.userId && (
+              <p className="text-xs text-destructive">{view.form.errors.userId}</p>
             )}
           </div>
           <div className="space-y-1.5">
@@ -244,7 +239,7 @@ export const SampleFormDialog = ({
         </Button>
         <Button
           onClick={() => view.form.submit()}
-          disabled={!view.form.form.name || !view.form.form.varietyId || !view.form.form.quantity || view.form.isSubmitting}
+          disabled={!view.form.form.name || !view.form.form.varietyId || !view.form.form.userId || view.form.isSubmitting}
         >
           {view.editingId ? "Update" : "Create"}
         </Button>

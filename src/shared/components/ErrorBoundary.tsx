@@ -15,6 +15,7 @@
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import axios from "axios";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -60,6 +61,15 @@ function DefaultErrorFallback({
         An unexpected error occurred. Try refreshing the page or contact support
         if the problem persists.
       </p>
+      {(() => {
+        const isAxiosErr = axios.isAxiosError(error);
+        const correlationId = isAxiosErr ? error.response?.data?.correlation_id : undefined;
+        return correlationId ? (
+          <p className="text-sm font-medium text-muted-foreground mt-2 bg-muted/50 px-3 py-1 rounded-md">
+            Reference ID: <code className="font-mono text-xs">{correlationId}</code>
+          </p>
+        ) : null;
+      })()}
       {import.meta.env.DEV && (
         <pre className="text-xs text-destructive bg-destructive/5 rounded-lg p-3 mt-3 max-w-lg overflow-auto text-left">
           {error.message}
