@@ -143,8 +143,7 @@ export const useUserDocumentsView = () => {
 
   const handleDownload = async (document: UserDocument) => {
     try {
-      const idOrUrl = document.download_url ?? document.id;
-      await downloadDocument(idOrUrl, document.title);
+      await downloadDocument(document.id, document.title);
       toast.success("Download started");
     } catch {
       toast.error("Failed to download file");

@@ -117,40 +117,32 @@ export const useDeleteUserDocument = () => {
 // ── File download (imperative helper) ────────────────────────────────────
 export const downloadDocument = async (
   idOrUrl: number | string,
-  filename?: string,
+  fallbackFilename?: string,
 ) => {
-  // If a full URL is provided (download_url), fetch it directly
-  if (typeof idOrUrl === "string" && /^https?:\/\//.test(idOrUrl)) {
-    const token = getToken();
-    const headers: Record<string, string> = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const resp = await fetch(idOrUrl, {
-      headers,
-      credentials: "include",
-    });
-    if (!resp.ok) throw new Error("Failed to download file");
-    const blob = await resp.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", filename ?? "download");
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-    return;
+  const id = Number(idOrUrl);
+  if (isNaN(id)) {
+    throw new Error("Invalid document ID");
   }
 
-  // Otherwise treat as an ID and call the API endpoint
-  const id = Number(idOrUrl);
-  const { data } = await api.get(`/user-documents/${id}/download`, {
+  const response = await api.get(`/user-documents/${id}/download`, {
     responseType: "blob",
   });
-  const url = window.URL.createObjectURL(new Blob([data as BlobPart]));
+
+  // Extract filename from Content-Disposition header if available
+  let filename = fallbackFilename ?? "download";
+  const contentDisposition = response.headers["content-disposition"];
+  if (contentDisposition) {
+    const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+    if (filenameMatch && filenameMatch[1]) {
+      filename = filenameMatch[1];
+    }
+  }
+
+  const blob = new Blob([response.data as BlobPart]);
+  const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", filename ?? "download");
+  link.setAttribute("download", filename);
   document.body.appendChild(link);
   link.click();
   link.remove();
