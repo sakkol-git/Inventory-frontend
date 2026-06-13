@@ -12,31 +12,32 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { api } from "@/core/api/api";
 import AppLayout from "@/core/layouts/AppLayout";
 import EmptyState from "@/shared/components/EmptyState";
 import PageHeader from "@/shared/components/PageHeader";
 import SearchFilter from "@/shared/components/SearchFilter";
+import { ServerPagination } from "@/shared/components/ServerPagination";
 import { useQuery } from "@tanstack/react-query";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -61,6 +62,8 @@ interface ActivityLogResponse {
     last_page: number;
     per_page: number;
     total: number;
+    from: number | null;
+    to: number | null;
   };
 }
 
@@ -118,7 +121,7 @@ const ActivityLog = () => {
 
         <SearchFilter
           query=""
-          onQueryChange={() => {}}
+          onQueryChange={() => { }}
           placeholder="Search activity logs..."
         >
           <Select value={eventFilter} onValueChange={setEventFilter}>
@@ -213,31 +216,9 @@ const ActivityLog = () => {
         )}
 
         {/* Pagination */}
-        {meta && meta.last_page > 1 && (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <p>
-              Page {meta.current_page} of {meta.last_page} ({meta.total} total)
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= meta.last_page}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
+        <div className="mt-4">
+          <ServerPagination meta={meta} onPageChange={setPage} />
+        </div>
 
         {/* Detail Dialog */}
         <Dialog
