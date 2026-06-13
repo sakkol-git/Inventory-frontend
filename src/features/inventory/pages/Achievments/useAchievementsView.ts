@@ -30,8 +30,11 @@ export function useAchievementsView() {
   const [revokeUserId, setRevokeUserId] = useState<number | null>(null);
   const [userSearch, setUserSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
 
-  const { data: achievements = [], isLoading, isError } = useAchievements();
+  const { data: response, isLoading, isError } = useAchievements({ page });
+  const achievements = response?.data ?? [];
+  const meta = response?.meta;
   const assignmentQuery = useAchievementById(assignmentAchievementId ?? 0);
   const { data: userResponse } = useUserList(
     userSearch ? { search: userSearch, per_page: 8 } : { per_page: 8 },
@@ -92,11 +95,11 @@ export function useAchievementsView() {
   const openEditForm = (achievement: Achievement) => {
     setEditItem(achievement);
     editForm.reset({
-      achievement_name: achievement.name,
+      achievement_name: achievement.achievement_name,
       description: achievement.description ?? undefined,
-      criteria_type: achievement.criteria_type,
-      criteria_value: achievement.criteria_value,
-      image_url: achievement.icon ?? undefined,
+      criteria_type: achievement.criteria?.type ?? "",
+      criteria_value: achievement.criteria?.value ?? 1,
+      image_url: achievement.image ?? undefined,
     });
   };
 
@@ -229,5 +232,7 @@ export function useAchievementsView() {
     handleEdit,
     handleAssign,
     confirmRevokeAchievement,
+    meta,
+    setPage,
   };
 }

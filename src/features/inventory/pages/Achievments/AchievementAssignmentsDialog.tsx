@@ -19,7 +19,7 @@ type AssignedUserView = {
 
 type AchievementAssignmentsDialogProps = {
   open: boolean;
-  achievement: { name: string } | null;
+  achievement: { achievement_name: string } | null;
   availableUsers: Array<{ id: number; name: string; email: string }>;
   assignedUsers: AssignedUserView[];
   selectedUserId: number | null;
@@ -50,7 +50,7 @@ export const AchievementAssignmentsDialog = ({
     <DialogContent className="max-w-2xl">
       <DialogHeader>
         <DialogTitle>
-          Manage Assignments{achievement ? ` — ${achievement.name}` : ""}
+          Manage Assignments{achievement ? ` — ${achievement.achievement_name}` : ""}
         </DialogTitle>
         <DialogDescription>
           Assign this achievement to a user or revoke it from an existing assignee.

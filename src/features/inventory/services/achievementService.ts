@@ -8,6 +8,7 @@ import type {
     StoreAchievementPayload,
     UpdateAchievementPayload,
 } from "@/shared/types/schemas";
+import type { PaginatedResponse } from "@/shared/types/pagination";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const QUERY_KEY = ["achievements"] as const;
@@ -16,11 +17,11 @@ export const useAchievements = (params?: Record<string, unknown>) =>
   useQuery({
     queryKey: [...QUERY_KEY, params],
     queryFn: async () => {
-      const { data } = await api.get<ApiResponse<Achievement[]>>(
+      const { data } = await api.get<PaginatedResponse<Achievement>>(
         "/achievements",
         { params },
       );
-      return data.data;
+      return data;
     },
   });
 
