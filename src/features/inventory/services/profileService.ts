@@ -82,8 +82,7 @@ export const useUpdateProfile = () => {
         
         const { data } = await api.post<{ message: string; data: User }>(
           "/profile",
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          formData
         );
         return data;
       }
