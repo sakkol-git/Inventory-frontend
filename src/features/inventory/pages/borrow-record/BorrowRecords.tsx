@@ -81,6 +81,7 @@ const TABS: { id: BorrowTab; label: string; icon: typeof ArrowLeftRight }[] = [
 const BorrowRecords = () => {
   const view = useBorrowRecordsView();
   const { isRole } = useAuth();
+  const isStudent = isRole("student");
   const { activeTab, setActiveTab } = view;
   const canViewAdminTabs = isRole("admin") || isRole("lab_manager");
   const tabs = canViewAdminTabs ? TABS : TABS.filter((tab) => tab.id === "all");
@@ -177,7 +178,7 @@ const BorrowRecords = () => {
           <BorrowTable
             items={view.items}
             activeTab={view.activeTab}
-            onReturn={view.openReturnDialog}
+            onReturn={isStudent ? undefined : view.openReturnDialog}
             onApprove={view.openApproveDialog}
             onReject={view.openRejectDialog}
           />
@@ -237,7 +238,7 @@ const BorrowTable = ({
 }: {
   items: BorrowItem[];
   activeTab: BorrowTab;
-  onReturn: (item: BorrowItem) => void;
+  onReturn?: (item: BorrowItem) => void;
   onApprove: (item: BorrowItem) => void;
   onReject: (item: BorrowItem) => void;
 }) => (
@@ -282,7 +283,7 @@ const BorrowRow = ({
 }: {
   item: BorrowItem;
   activeTab: BorrowTab;
-  onReturn: (item: BorrowItem) => void;
+  onReturn?: (item: BorrowItem) => void;
   onApprove: (item: BorrowItem) => void;
   onReject: (item: BorrowItem) => void;
 }) => (
@@ -346,7 +347,7 @@ const BorrowRow = ({
             </Button>
           </>
         )}
-        {activeTab !== "pending" && item.status === "borrowed" && (
+        {activeTab !== "pending" && item.status === "borrowed" && onReturn && (
           <Button
             variant="outline"
             size="sm"

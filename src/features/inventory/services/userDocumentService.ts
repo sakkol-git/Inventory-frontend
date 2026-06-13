@@ -43,7 +43,9 @@ export const useUploadDocument = () => {
       const formData = new FormData();
       formData.append("file", payload.file);
       formData.append("title", payload.title);
-      formData.append("file_type", payload.file_type);
+      if (payload.file_type) {
+        formData.append("file_type", payload.file_type);
+      }
       if (payload.description) {
         formData.append("description", payload.description);
       }
@@ -72,10 +74,10 @@ export const useUpdateUserDocument = () => {
         const formData = new FormData();
         formData.append("_method", "PUT");
         formData.append("file", payload.file);
-        if (payload.title !== undefined) {
+        if (payload.title) {
           formData.append("title", payload.title);
         }
-        if (payload.file_type !== undefined) {
+        if (payload.file_type) {
           formData.append("file_type", payload.file_type);
         }
         if (payload.description !== undefined && payload.description !== null) {

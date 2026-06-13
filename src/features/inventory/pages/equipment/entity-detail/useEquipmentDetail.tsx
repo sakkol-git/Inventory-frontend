@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "@/core/auth/useAuth";
 import {
   buildActions,
   buildAlerts,
@@ -41,7 +42,7 @@ interface UseEquipmentDetailResult {
 
 // ─── Config Assembly (pure transform) ────────────────────────────────────
 
-function assembleConfig(data: EquipmentApi): EquipmentPageConfig {
+function assembleConfig(data: EquipmentApi, isStudent: boolean): EquipmentPageConfig {
   const color = statusColor(data.status);
   const badgeClass = statusBadgeClass(data.status);
 
@@ -100,7 +101,9 @@ function assembleConfig(data: EquipmentApi): EquipmentPageConfig {
     ],
 
     alerts: buildAlerts(data),
-    actions: buildActions(data.status, data.is_borrowable),
+    actions: isStudent 
+      ? buildActions(data.status, data.is_borrowable).filter((a) => a.label !== "Return")
+      : buildActions(data.status, data.is_borrowable),
 
     mainSections: [
       {
@@ -210,7 +213,10 @@ export function useEquipmentDetail(): UseEquipmentDetailResult {
 
   const { data, isLoading, isError } = useEquipmentById(safeId);
 
-  const config = useMemo(() => (data ? assembleConfig(data) : null), [data]);
+  const { isRole } = useAuth();
+  const isStudent = isRole("student");
+
+  const config = useMemo(() => (data ? assembleConfig(data, isStudent) : null), [data, isStudent]);
 
   if (isLoading) return { state: "loading", id, config: null };
   if (isError || !data) return { state: "not-found", id, config: null };

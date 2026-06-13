@@ -26,6 +26,7 @@ import {
     formatEnumLabel,
     useEquipmentView,
 } from "./useEquipmentView";
+import { useAuth } from "@/core/auth/useAuth";
 
 /* ─── Status Filter (co-located — too small to extract) ─────────────────── */
 
@@ -57,6 +58,8 @@ const StatusFilter = ({
 
 const Equipment = () => {
   const view = useEquipmentView();
+  const { isRole } = useAuth();
+  const isStudent = isRole("student");
 
   // ── Borrow / Return dialog state ──
   const [borrowDialogOpen, setBorrowDialogOpen] = useState(false);
@@ -108,7 +111,7 @@ const Equipment = () => {
           onEdit={view.openEditForm}
           onDelete={view.requestDeleteEquipment}
           onBorrow={handleBorrow}
-          onReturn={handleReturn}
+          onReturn={isStudent ? undefined : handleReturn}
         />
       )}
       renderTable={(items) => (
@@ -118,7 +121,7 @@ const Equipment = () => {
           onEdit={view.openEditForm}
           onDelete={view.requestDeleteEquipment}
           onBorrow={handleBorrow}
-          onReturn={handleReturn}
+          onReturn={isStudent ? undefined : handleReturn}
         />
       )}
     >
