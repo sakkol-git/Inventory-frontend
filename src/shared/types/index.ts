@@ -260,11 +260,13 @@ export interface AchievementUser {
 
 export interface Achievement {
   id: number;
-  name: string;
+  achievement_name: string;
   description: string | null;
-  criteria_type: string;
-  criteria_value: number;
-  icon: string | null;
+  criteria: {
+    type: string;
+    value: number;
+  };
+  image: string | null;
   assigned_user_ids?: number[];
   users?: AchievementUser[];
   earned_at?: string;

@@ -37,15 +37,16 @@ const UserProfile = () => {
 
   // Fetch real achievements assigned to the current user
   const { data: achievements } = useAchievements({ user_id: "me", per_page: 100 });
-  
+
   // Fetch plant samples contributed by the current user
-  const { data: sampleData, meta: sampleMeta } = usePlantSampleList({
+  const { data: sampleResponse } = usePlantSampleList({
     user_id: "me",
     page: samplesPage,
     per_page: 8,
   });
 
-  const contributions = sampleData ?? [];
+  const contributions = sampleResponse?.data ?? [];
+  const sampleMeta = sampleResponse?.meta;
 
   // Map auth context user to profile shape
   const user = {
@@ -222,16 +223,18 @@ const UserProfile = () => {
                           </div>
                           <div className="min-w-0">
                             <CardTitle className="text-sm font-semibold">
-                              {sample.sample_code}
+                              {sample.identity.code}
                             </CardTitle>
                             <CardDescription className="text-xs mt-1">
-                              Variety: {sample.plant_variety?.name ?? "Unknown"} • Status: {sample.status}
+                              Variety: {sample.relationships.variety?.name ?? "Unknown"} • Status: {sample.identity.status}
                             </CardDescription>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-xs">
-                          {new Date(sample.received_date).toLocaleDateString()}
-                        </Badge>
+                        {sample.lab_info.brought_at && (
+                          <Badge variant="outline" className="text-xs">
+                            {new Date(sample.lab_info.brought_at).toLocaleDateString()}
+                          </Badge>
+                        )}
                       </div>
                     </CardHeader>
                   </Card>
