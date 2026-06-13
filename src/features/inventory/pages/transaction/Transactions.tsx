@@ -11,22 +11,23 @@ import { ArrowLeftRight } from "lucide-react";
 // ─── Internal Components ───────────────────────────────────────────────────
 import { Button } from "@/components/ui/button";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import AppLayout from "@/core/layouts/AppLayout";
 import EmptyState from "@/shared/components/EmptyState";
+import { LoadingState } from "@/shared/components/LoadingState";
 import PageHeader from "@/shared/components/PageHeader";
 import { ServerPagination } from "@/shared/components/ServerPagination";
 import SearchFilter from "@/shared/components/SearchFilter";
@@ -34,15 +35,15 @@ import { cn } from "@/shared/lib/utils";
 
 // ─── Hook & Helpers ────────────────────────────────────────────────────────
 import {
-    actionIcon,
-    actionStyle,
-    formatEnumLabel,
-    formatTimestamp,
-    itemTypeLabel,
-    quantityStyle,
-    TRANSACTION_ACTIONS,
-    useTransactionsView,
-    type TransactionItem,
+  actionIcon,
+  actionStyle,
+  formatEnumLabel,
+  formatTimestamp,
+  itemTypeLabel,
+  quantityStyle,
+  TRANSACTION_ACTIONS,
+  useTransactionsView,
+  type TransactionItem,
 } from "./useTransactionsView";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -75,9 +76,7 @@ const Transactions = () => {
         </SearchFilter>
 
         {view.isLoading && (
-          <p className="text-sm text-muted-foreground text-center py-12">
-            Loading transactions…
-          </p>
+          <LoadingState variant="skeleton" rows={5} />
         )}
 
         {view.isError && (

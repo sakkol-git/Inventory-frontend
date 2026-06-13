@@ -5,6 +5,7 @@
 import {
   Award,
   Leaf,
+  Loader2,
   Mail,
   Phone,
   Shield,
@@ -35,10 +36,10 @@ const UserProfile = () => {
   const [samplesPage, setSamplesPage] = useState(1);
 
   // Fetch real achievements assigned to the current user
-  const { data: achievements } = useAchievements({ user_id: "me", per_page: 100 });
+  const { data: achievements, isLoading: isAchievementsLoading } = useAchievements({ user_id: "me", per_page: 100 });
 
   // Fetch plant samples contributed by the current user
-  const { data: sampleResponse } = usePlantSampleList({
+  const { data: sampleResponse, isLoading: isSamplesLoading } = usePlantSampleList({
     user_id: "me",
     page: samplesPage,
     per_page: 8, // Using a multiple of 4 is better for 1/2/4 grid layouts, but 8 is fine for 1/2/3 grids on most pages
@@ -154,7 +155,11 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {!achievements || achievements.length === 0 ? (
+              {isAchievementsLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                </div>
+              ) : !achievements || achievements.length === 0 ? (
                 <Card className="p-12 text-center border-dashed">
                   <Award className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                   <h3 className="font-medium text-lg">No achievements yet</h3>
@@ -207,7 +212,11 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {contributions.length === 0 ? (
+              {isSamplesLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary/50" />
+                </div>
+              ) : contributions.length === 0 ? (
                 <Card className="p-12 text-center border-dashed">
                   <Leaf className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                   <h3 className="font-medium text-lg">No contributions yet</h3>

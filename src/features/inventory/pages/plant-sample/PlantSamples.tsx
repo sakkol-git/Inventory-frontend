@@ -37,6 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/core/layouts/AppLayout";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import EmptyState from "@/shared/components/EmptyState";
+import { LoadingState } from "@/shared/components/LoadingState";
 import { ExportButton } from "@/shared/components/ExportButton";
 import { FilterChips } from "@/shared/components/FilterChips";
 import PageHeader from "@/shared/components/PageHeader";
@@ -150,7 +151,9 @@ const PlantSamples = () => {
           onRemove={() => view.setStatusFilter("all")}
         />
 
-        {!hasResults ? (
+        {view.isLoading ? (
+          <LoadingState variant="skeleton" rows={5} />
+        ) : !hasResults ? (
           <EmptyState
             title="No samples found"
             description="Try adjusting your search or add a new sample."

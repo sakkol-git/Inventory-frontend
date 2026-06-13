@@ -38,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import AppLayout from "@/core/layouts/AppLayout";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import EmptyState from "@/shared/components/EmptyState";
+import { LoadingState } from "@/shared/components/LoadingState";
 import { ExportButton } from "@/shared/components/ExportButton";
 import PageHeader from "@/shared/components/PageHeader";
 import { QuickStats } from "@/shared/components/QuickStats";
@@ -87,7 +88,9 @@ const PlantVarieties = () => {
           </div>
         </div>
 
-        {!hasResults ? (
+        {view.isLoading ? (
+          <LoadingState variant="skeleton" rows={5} />
+        ) : !hasResults ? (
           <EmptyState
             title="No varieties found"
             description="Try adjusting your search or add a new variety."

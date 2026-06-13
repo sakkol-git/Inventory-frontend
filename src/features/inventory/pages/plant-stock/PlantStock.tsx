@@ -37,6 +37,7 @@ import {
 import AppLayout from "@/core/layouts/AppLayout";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
 import EmptyState from "@/shared/components/EmptyState";
+import { LoadingState } from "@/shared/components/LoadingState";
 import PageHeader from "@/shared/components/PageHeader";
 import { ServerPagination } from "@/shared/components/ServerPagination";
 import { QuickStats } from "@/shared/components/QuickStats";
@@ -87,7 +88,9 @@ const PlantStock = () => {
           <ViewToggle current={view.viewMode} onChange={view.switchViewMode} />
         </SearchFilter>
 
-        {!hasResults && (
+        {view.isLoading ? (
+          <LoadingState variant="skeleton" rows={5} />
+        ) : !hasResults && (
           <EmptyState
             icon={Warehouse}
             title="No stock entries found"
