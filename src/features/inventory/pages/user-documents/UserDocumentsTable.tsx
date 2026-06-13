@@ -108,7 +108,7 @@ const UserDocumentsTable = ({
                     <Download className="h-4 w-4" />
                     <span className="sr-only">Download</span>
                   </Button>
-                  <PermissionGate permission="documents.update">
+                  <PermissionGate permission="documents.edit">
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -120,7 +120,7 @@ const UserDocumentsTable = ({
                       <span className="sr-only">Edit</span>
                     </Button>
                   </PermissionGate>
-                  <PermissionGate permission="user_documents.delete">
+                  <PermissionGate permission="documents.delete">
                     <Button
                       variant="ghost"
                       size="icon"
