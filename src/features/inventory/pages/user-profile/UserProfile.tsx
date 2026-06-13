@@ -36,7 +36,8 @@ const UserProfile = () => {
   const [samplesPage, setSamplesPage] = useState(1);
 
   // Fetch real achievements assigned to the current user
-  const { data: achievements, isLoading: isAchievementsLoading } = useAchievements({ user_id: "me", per_page: 100 });
+  const { data: achievementResponse, isLoading: isAchievementsLoading } = useAchievements({ user_id: "me", per_page: 100 });
+  const achievements = achievementResponse?.data ?? [];
 
   // Fetch plant samples contributed by the current user
   const { data: sampleResponse, isLoading: isSamplesLoading } = usePlantSampleList({
