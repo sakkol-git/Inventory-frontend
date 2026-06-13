@@ -71,14 +71,13 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: UpdateProfilePayload) => {
-      if (payload.image instanceof File) {
+      if (payload.image) {
         const formData = new FormData();
         Object.entries(payload).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== "") {
             formData.append(key, value as any);
           }
         });
-        formData.append('_method', 'PUT');
         
         const { data } = await api.post<{ message: string; data: User }>(
           "/profile",
