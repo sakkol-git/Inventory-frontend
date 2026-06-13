@@ -31,6 +31,8 @@ export const updateProfileSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   email: z.string().email().max(255).optional(),
   phone: z.string().max(20).nullable().optional(),
+  profile_image_url: z.string().url().max(2048).nullable().optional().or(z.literal("")),
+  image: z.instanceof(File).optional(),
 });
 export type UpdateProfilePayload = z.infer<typeof updateProfileSchema>;
 

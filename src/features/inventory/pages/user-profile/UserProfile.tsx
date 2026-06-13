@@ -12,6 +12,7 @@ import {
   User,
 } from "lucide-react";
 import { useState } from "react";
+import { EditProfileDialog } from "./EditProfileDialog";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -56,7 +57,7 @@ const UserProfile = () => {
     email: authUser?.email ?? "",
     role: authUser?.role ?? "Lab Assistant",
     phone: authUser?.phone ?? null,
-    profileImageUrl: undefined as string | undefined,
+    profileImageUrl: authUser?.profile_image_url ?? undefined,
   };
 
   return (
@@ -113,6 +114,7 @@ const UserProfile = () => {
                             <Shield className="h-3.5 w-3.5 opacity-70" />
                             {user.role}
                           </Badge>
+                          <EditProfileDialog />
                         </div>
                         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-6 text-sm mt-5 text-muted-foreground">
                           <div className="flex items-center gap-2">

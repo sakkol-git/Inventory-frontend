@@ -99,8 +99,14 @@ const TopNav = () => {
               variant="ghost"
               className="flex items-center gap-2.5 px-2.5 h-10"
             >
-              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                {user?.name ? (
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center overflow-hidden">
+                {user?.profile_image_url ? (
+                  <img
+                    src={user.profile_image_url}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : user?.name ? (
                   <span className="text-xs font-semibold text-primary">
                     {user.name
                       .split(" ")

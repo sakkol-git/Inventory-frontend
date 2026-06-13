@@ -37,6 +37,7 @@ export interface User {
   email: string;
   phone: string | null;
   role: UserRole;
+  profile_image_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -59,6 +60,7 @@ export interface AuthProfileResponse {
   email: string;
   phone: string | null;
   role: UserRole;
+  profile_image_url?: string | null;
   permissions: string[];
 }
 
