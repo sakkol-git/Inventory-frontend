@@ -78,6 +78,7 @@ export const useUpdateProfile = () => {
             formData.append(key, value as any);
           }
         });
+        formData.append('_method', 'PUT');
         
         const { data } = await api.post<{ message: string; data: User }>(
           "/profile",
