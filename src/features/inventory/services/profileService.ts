@@ -74,7 +74,7 @@ export const useUpdateProfile = () => {
       if (payload.image instanceof File) {
         const formData = new FormData();
         Object.entries(payload).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
+          if (value !== undefined && value !== null && value !== "") {
             formData.append(key, value as any);
           }
         });
@@ -87,9 +87,14 @@ export const useUpdateProfile = () => {
         return data;
       }
 
+      // Clean payload for JSON requests as well
+      const cleanPayload = Object.fromEntries(
+        Object.entries(payload).filter(([_, v]) => v !== undefined && v !== null && v !== "")
+      );
+
       const { data } = await api.put<{ message: string; data: User }>(
         "/profile",
-        payload,
+        cleanPayload,
       );
       return data;
     },
