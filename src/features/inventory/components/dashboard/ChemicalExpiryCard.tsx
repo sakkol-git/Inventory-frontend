@@ -1,13 +1,15 @@
-import { AlertTriangle, FlaskConical } from "lucide-react";
+import { useDashboardData } from "@/features/inventory/services/dashboardService";
+import { AlertTriangle, FlaskConical, CheckCircle } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
-const expiringChemicals = [
-  { name: "Sodium Hydroxide (NaOH)", expiry: "Feb 12, 2026", daysLeft: 7, quantity: "2.5L", hazard: "high" },
-  { name: "Hydrochloric Acid (HCl)", expiry: "Feb 18, 2026", daysLeft: 13, quantity: "1L", hazard: "high" },
-  { name: "Ethanol 95%", expiry: "Feb 25, 2026", daysLeft: 20, quantity: "5L", hazard: "low" },
-];
-
 const ChemicalExpiryCard = () => {
+  const { data } = useDashboardData();
+  
+  const total = data?.chemicals_count ?? 0;
+  const expired = data?.chemicals_expired ?? 0;
+  const expiringSoon = data?.chemicals_expiring_soon ?? 0;
+  const healthy = total - expired - expiringSoon;
+
   return (
     <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
       {/* Header */}
@@ -16,49 +18,30 @@ const ChemicalExpiryCard = () => {
           <FlaskConical className="h-5 w-5 text-destructive" />
           <h3 className="section-title text-foreground">Chemical Expiry Alerts</h3>
         </div>
-        <span className="minimal-badge-destructive">
-          {expiringChemicals.length} items
+        <span className="text-sm font-medium text-muted-foreground tabular-nums">
+          {total} total
         </span>
       </div>
 
-      {/* Chemical List */}
-      <div className="space-y-3">
-        {expiringChemicals.map((chemical, index) => (
-          <div
-            key={index}
-            className={cn(
-              "flex items-center justify-between p-4 rounded-xl transition-all hover:bg-muted/40",
-              chemical.hazard === "high" ? "hazard-high" : "hazard-low"
-            )}
-          >
-            <div className="flex items-center gap-4">
-              <div className={cn(
-                "w-10 h-10 flex items-center justify-center rounded-xl",
-                chemical.daysLeft <= 7 
-                  ? "bg-muted" 
-                  : "bg-muted"
-              )}>
-                <AlertTriangle className={cn(
-                  "h-5 w-5",
-                  chemical.daysLeft <= 7 ? "text-destructive" : "text-warning"
-                )} />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">{chemical.name}</p>
-                <p className="text-sm text-muted-foreground font-medium">{chemical.quantity}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-foreground">{chemical.expiry}</p>
-              <p className={cn(
-                "text-xs font-medium",
-                chemical.daysLeft <= 7 ? "text-destructive" : "text-warning"
-              )}>
-                {chemical.daysLeft} days left
-              </p>
-            </div>
-          </div>
-        ))}
+      {/* Summary Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className={cn("p-4 rounded-xl border flex flex-col items-center justify-center text-center", expired > 0 ? "border-destructive bg-destructive/10" : "border-border")}>
+           <AlertTriangle className={cn("h-6 w-6 mb-2", expired > 0 ? "text-destructive" : "text-muted-foreground")} />
+           <p className={cn("text-2xl font-semibold tabular-nums", expired > 0 ? "text-destructive" : "text-foreground")}>{expired}</p>
+           <p className="text-xs font-medium text-muted-foreground tracking-wide mt-1">Expired</p>
+        </div>
+
+        <div className={cn("p-4 rounded-xl border flex flex-col items-center justify-center text-center", expiringSoon > 0 ? "border-warning bg-warning/10" : "border-border")}>
+           <AlertTriangle className={cn("h-6 w-6 mb-2", expiringSoon > 0 ? "text-warning" : "text-muted-foreground")} />
+           <p className={cn("text-2xl font-semibold tabular-nums", expiringSoon > 0 ? "text-warning" : "text-foreground")}>{expiringSoon}</p>
+           <p className="text-xs font-medium text-muted-foreground tracking-wide mt-1">Expiring Soon</p>
+        </div>
+
+        <div className="p-4 rounded-xl border border-border flex flex-col items-center justify-center text-center">
+           <CheckCircle className="h-6 w-6 mb-2 text-primary" />
+           <p className="text-2xl font-semibold tabular-nums text-primary">{healthy}</p>
+           <p className="text-xs font-medium text-muted-foreground tracking-wide mt-1">Good Condition</p>
+        </div>
       </div>
     </div>
   );

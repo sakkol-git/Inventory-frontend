@@ -1,17 +1,20 @@
+import { useDashboardData } from "@/features/inventory/services/dashboardService";
 import { Leaf } from "lucide-react";
 
 const PlantHealthCard = () => {
-  const total = 1247;
-  const healthy = 1089;
-  const failed = 42;
-  const growing = total - healthy - failed;
+  const { data } = useDashboardData();
   
-  const healthPercentage = Math.round((healthy / total) * 100);
+  const active = data?.samples_by_status?.active ?? 0;
+  const inactive = data?.samples_by_status?.inactive ?? 0;
+  const archived = data?.samples_by_status?.archived ?? 0;
+  const total = active + inactive + archived || 1; // Prevent div by zero
+  
+  const healthPercentage = Math.round((active / total) * 100);
 
   const stats = [
-    { label: "Healthy", value: healthy, color: "bg-primary", textColor: "text-primary" },
-    { label: "Growing", value: growing, color: "bg-warning", textColor: "text-warning" },
-    { label: "Failed", value: failed, color: "bg-destructive", textColor: "text-destructive" },
+    { label: "Active", value: active, color: "bg-primary", textColor: "text-primary" },
+    { label: "Inactive", value: inactive, color: "bg-warning", textColor: "text-warning" },
+    { label: "Archived", value: archived, color: "bg-muted-foreground", textColor: "text-muted-foreground" },
   ];
 
   return (
@@ -19,7 +22,7 @@ const PlantHealthCard = () => {
       {/* Header */}
       <div className="section-header">
         <Leaf className="h-5 w-5 text-muted-foreground" />
-        <h3 className="section-title text-foreground">Plant Inventory Health</h3>
+        <h3 className="section-title text-foreground">Plant Samples Health</h3>
       </div>
 
       <div className="flex items-center gap-8">

@@ -1,14 +1,17 @@
+import { useDashboardData } from "@/features/inventory/services/dashboardService";
 import { Wrench } from "lucide-react";
 
 const EquipmentAvailabilityCard = () => {
-  const total = 89;
-  const available = 67;
-  const borrowed = 18;
-  const maintenance = 4;
+  const { data } = useDashboardData();
+  
+  const available = data?.equipment_by_status?.available ?? 0;
+  const maintenance = data?.equipment_by_status?.maintenance ?? 0;
+  const in_use = data?.equipment_by_status?.in_use ?? 0;
+  const total = data?.equipment_count ?? 1; // Prevent div by 0
 
   const stats = [
     { label: "Available", value: available, color: "bg-primary", textColor: "text-primary", percent: (available / total) * 100 },
-    { label: "Borrowed", value: borrowed, color: "bg-warning", textColor: "text-warning", percent: (borrowed / total) * 100 },
+    { label: "In Use", value: in_use, color: "bg-warning", textColor: "text-warning", percent: (in_use / total) * 100 },
     { label: "Maintenance", value: maintenance, color: "bg-muted-foreground/50", textColor: "text-muted-foreground", percent: (maintenance / total) * 100 },
   ];
 
