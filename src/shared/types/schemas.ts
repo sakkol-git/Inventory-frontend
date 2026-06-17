@@ -314,6 +314,7 @@ export const storeUserDocumentSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
   file_type: z.enum(["doc", "pdf", "image", "certificate", "other"]).nullable().optional(),
   description: z.string().nullable().optional(),
+  achievement_id: z.coerce.number().optional(),
 });
 export type StoreUserDocumentPayload = z.infer<typeof storeUserDocumentSchema>;
 
@@ -325,6 +326,7 @@ export const updateUserDocumentSchema = z.object({
   title: z.string().min(1, "Title is required").max(255).optional(),
   file_type: z.enum(["doc", "pdf", "image", "certificate", "other"]).nullable().optional(),
   description: z.string().nullable().optional(),
+  achievement_id: z.coerce.number().optional(),
 });
 export type UpdateUserDocumentPayload = z.infer<typeof updateUserDocumentSchema>;
 

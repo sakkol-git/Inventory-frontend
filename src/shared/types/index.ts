@@ -271,6 +271,7 @@ export interface Achievement {
   image: string | null;
   assigned_user_ids?: number[];
   users?: AchievementUser[];
+  user_documents?: UserDocument[];
   earned_at?: string;
   created_at: string;
   updated_at: string;
@@ -280,6 +281,7 @@ export interface Achievement {
 export interface UserDocument {
   id: number;
   user_id: number;
+  achievement_id?: number;
   title: string;
   file_path?: string;
   download_url?: string;
@@ -288,6 +290,7 @@ export interface UserDocument {
   description: string | null;
   status: "processing" | "active" | "failed";
   user: { id: number; name: string } | Record<string, never>;
+  achievement?: Achievement;
   created_at: string;
   updated_at: string;
 }
