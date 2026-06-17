@@ -100,27 +100,31 @@ const PageHeader = ({ header }: PageHeaderProps) => {
  * Row 3: ActivityHeatmap + RecentActivity
  */
 function renderOverviewLayout(widgets: InventoryWidget[]) {
-  const pairs: [string, string][] = [
-    ["plant-health", "chemical-expiry"],
-    ["equipment-availability", "transaction-feed"],
-    ["activity-heatmap", "recent-activity"],
-  ];
+  const plantHealth = widgets.find((w) => w.type === "plant-health");
+  const chemicalExpiry = widgets.find((w) => w.type === "chemical-expiry");
+  const equipmentAvailability = widgets.find(
+    (w) => w.type === "equipment-availability",
+  );
+  const activityHeatmap = widgets.find((w) => w.type === "activity-heatmap");
+  const transactionFeed = widgets.find((w) => w.type === "transaction-feed");
+  const recentActivity = widgets.find((w) => w.type === "recent-activity");
 
-  return pairs.map(([leftType, rightType]) => {
-    const left = widgets.find((w) => w.type === leftType);
-    const right = widgets.find((w) => w.type === rightType);
-    if (!left && !right) return null;
-
-    return (
-      <div
-        key={`${leftType}-${rightType}`}
-        className="grid grid-cols-1 xl:grid-cols-2 gap-6"
-      >
-        {left && <WidgetSlot widget={left} />}
-        {right && <WidgetSlot widget={right} />}
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="xl:col-span-2 flex flex-col gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {plantHealth && <WidgetSlot widget={plantHealth} />}
+          {chemicalExpiry && <WidgetSlot widget={chemicalExpiry} />}
+        </div>
+        {equipmentAvailability && <WidgetSlot widget={equipmentAvailability} />}
+        {activityHeatmap && <WidgetSlot widget={activityHeatmap} />}
       </div>
-    );
-  });
+      <div className="flex flex-col gap-6">
+        {transactionFeed && <WidgetSlot widget={transactionFeed} />}
+        {recentActivity && <WidgetSlot widget={recentActivity} />}
+      </div>
+    </div>
+  );
 }
 
 /**
