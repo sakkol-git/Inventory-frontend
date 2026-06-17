@@ -2,69 +2,58 @@
  * Achievements — composition root for achievement definitions and assignments.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-import { Award, Plus } from "lucide-react";
+import { Award } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog";
-import EmptyState from "@/shared/components/EmptyState";
-import { LoadingState } from "@/shared/components/LoadingState";
-import PageHeader from "@/shared/components/PageHeader";
-import AppLayout from "@/core/layouts/AppLayout";
+import { ListPage } from "@/shared/components/ListPage";
 
 import { AchievementAssignmentsDialog } from "./AchievementAssignmentsDialog";
 import { AchievementFormDialog } from "./AchievementFormDialog";
 import { AchievementsTable } from "./AchievementsTable";
+import { AchievementGrid } from "./AchievementGrid";
 import { useAchievementsView } from "./useAchievementsView";
-import { ServerPagination } from "@/shared/components/ServerPagination";
 
 const Achievements = () => {
   const view = useAchievementsView();
 
   return (
-    <AppLayout>
-      <div className="page-content">
-        <PageHeader
-          title="Achievements"
-          description="Manage achievement definitions"
-          icon={Award}
-          actions={
-            <Button className="gap-2" onClick={view.openCreateForm}>
-              <Plus className="h-4 w-4" />
-              Add Achievement
-            </Button>
-          }
+    <ListPage
+      icon={Award}
+      title="Achievements"
+      description="Manage achievement definitions"
+      addLabel="Add Achievement"
+      onAdd={view.openCreateForm}
+      stats={view.quickStats}
+      searchPlaceholder="Search achievements..."
+      searchQuery={view.searchQuery}
+      onSearchChange={view.updateSearchQuery}
+      viewMode={view.viewMode}
+      onViewModeChange={view.switchViewMode}
+      items={view.achievements}
+      meta={view.meta}
+      onPageChange={view.setPage}
+      isLoading={view.isLoading}
+      isError={view.isError}
+      emptyTitle="No achievements found"
+      emptyDescription="Try adjusting your search or create a new achievement."
+      renderGrid={(items) => (
+        <AchievementGrid
+          items={items}
+          onManageAssignments={view.openAssignments}
+          onEdit={view.openEditForm}
+          onDelete={view.requestDeleteAchievement}
+          onNavigate={view.navigateToDetail}
         />
-
-        {view.isLoading ? (
-          <LoadingState
-            variant="skeleton"
-            rows={5}
-            text="Loading achievements..."
-          />
-        ) : view.isError ? (
-          <EmptyState
-            icon={Award}
-            title="Failed to load achievements"
-            description="Could not connect to the server. Please check your connection and try again."
-          />
-        ) : view.achievements.length === 0 ? (
-          <EmptyState
-            icon={Award}
-            title="No achievements defined"
-            description="Create your first achievement to get started."
-          />
-        ) : (
-          <AchievementsTable
-            achievements={view.achievements}
-            onManageAssignments={view.openAssignments}
-            onEdit={view.openEditForm}
-            onDelete={view.requestDeleteAchievement}
-          />
-        )}
-
-        <ServerPagination meta={view.meta} onPageChange={view.setPage} />
-      </div>
-
+      )}
+      renderTable={(items) => (
+        <AchievementsTable
+          achievements={items}
+          onManageAssignments={view.openAssignments}
+          onEdit={view.openEditForm}
+          onDelete={view.requestDeleteAchievement}
+        />
+      )}
+    >
       <AchievementFormDialog
         mode="create"
         open={view.createOpen}
@@ -127,7 +116,7 @@ const Achievements = () => {
         variant="destructive"
         isPending={view.revokeMutation.isPending}
       />
-    </AppLayout>
+    </ListPage>
   );
 };
 

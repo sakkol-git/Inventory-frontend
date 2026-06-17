@@ -46,14 +46,13 @@ export const AchievementsTable = ({
         {achievements.map((achievement) => (
           <TableRow key={achievement.id}>
             <TableCell className="font-medium">
-              {achievement.icon ? `${achievement.icon} ` : ""}
-              {achievement.name}
+              {achievement.achievement_name}
             </TableCell>
             <TableCell className="max-w-xs truncate text-muted-foreground">
               {achievement.description ?? "—"}
             </TableCell>
-            <TableCell>{achievement.criteria_type}</TableCell>
-            <TableCell>{achievement.criteria_value}</TableCell>
+            <TableCell>{achievement.criteria?.type ?? "—"}</TableCell>
+            <TableCell>{achievement.criteria?.value ?? "—"}</TableCell>
             <TableCell>
               <Badge variant="outline" className="gap-1">
                 <Users className="h-3 w-3" />
@@ -66,7 +65,7 @@ export const AchievementsTable = ({
                   variant="ghost"
                   size="icon"
                   onClick={() => onManageAssignments(achievement)}
-                  aria-label={`Manage assignments for ${achievement.name}`}
+                  aria-label={`Manage assignments for ${achievement.achievement_name}`}
                 >
                   <UserPlus className="h-4 w-4" />
                 </Button>
@@ -75,7 +74,7 @@ export const AchievementsTable = ({
                     variant="ghost"
                     size="icon"
                     onClick={() => onEdit(achievement)}
-                    aria-label={`Edit ${achievement.name}`}
+                    aria-label={`Edit ${achievement.achievement_name}`}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -86,7 +85,7 @@ export const AchievementsTable = ({
                     size="icon"
                     className="text-destructive"
                     onClick={() => onDelete(achievement)}
-                    aria-label={`Delete ${achievement.name}`}
+                    aria-label={`Delete ${achievement.achievement_name}`}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
