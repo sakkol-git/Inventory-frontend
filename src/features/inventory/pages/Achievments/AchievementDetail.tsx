@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAchievementById } from "@/features/inventory/services/achievementService";
+import { downloadDocument } from "@/features/inventory/services/userDocumentService";
 import type { UserDocument } from "@/shared/types/index";
 
 export default function AchievementDetail() {
@@ -12,9 +13,11 @@ export default function AchievementDetail() {
   const navigate = useNavigate();
   const { data: achievement, isLoading } = useAchievementById(Number(id));
 
-  const handleDownload = (doc: UserDocument) => {
-    if (doc.download_url) {
-      window.open(doc.download_url, "_blank");
+  const handleDownload = async (doc: UserDocument) => {
+    try {
+      await downloadDocument(doc.id, doc.title);
+    } catch (error) {
+      console.error("Failed to download document:", error);
     }
   };
 
@@ -101,9 +104,9 @@ export default function AchievementDetail() {
                           <td className="p-3 uppercase text-muted-foreground">{doc.file_type}</td>
                           <td className="p-3 capitalize">{doc.status || "active"}</td>
                           <td className="p-3 text-right">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDownload(doc)}
                               disabled={!doc.download_url}
                             >

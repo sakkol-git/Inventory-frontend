@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Pencil, Trash2, type LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, memo } from "react";
 
 export interface ProductCardMeta {
   icon?: LucideIcon;
@@ -53,7 +53,7 @@ export interface ProductCardProps {
  * - Meta grid with icons
  * - Tags + optional edit button in footer
  */
-export const ProductCard = ({
+export const ProductCard = memo(({
   image,
   fallbackImage,
   title,
@@ -215,4 +215,6 @@ export const ProductCard = ({
       </div>
     </div>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";
