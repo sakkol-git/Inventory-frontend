@@ -140,6 +140,10 @@ const EquipmentDetail = lazyRoute(
   () => import("@/features/inventory/pages/equipment/EquipmentDetail"),
   { displayName: "EquipmentDetail" },
 );
+const AchievementDetail = lazyRoute(
+  () => import("@/features/inventory/pages/Achievments/AchievementDetail"),
+  { displayName: "AchievementDetail" },
+);
 
 // ─── Reports ─────────────────────────────────────────────────────────────────
 const ReportsDashboard = lazyRoute(
@@ -377,6 +381,14 @@ export default function AppRoutes() {
         element={
           <Protected>
             <EquipmentDetail />
+          </Protected>
+        }
+      />
+      <Route
+        path="/inventory/achievements/:id"
+        element={
+          <Protected permission="achievements.view">
+            <AchievementDetail />
           </Protected>
         }
       />

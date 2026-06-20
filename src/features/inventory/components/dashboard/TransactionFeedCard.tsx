@@ -32,65 +32,7 @@ interface Transaction {
   imageUrl?: string;
 }
 
-const transactions: Transaction[] = [
-  {
-    id: "TX-1041",
-    type: "checkout",
-    item: "pH Meter",
-    category: "equipment",
-    user: "Dr. Chen",
-    status: "completed",
-    time: "09:15",
-  },
-  {
-    id: "TX-1040",
-    type: "consume",
-    item: "Ethanol 95%",
-    category: "chemical",
-    user: "J. Wilson",
-    quantity: "200mL",
-    status: "completed",
-    time: "09:02",
-  },
-  {
-    id: "TX-1039",
-    type: "return",
-    item: "Laminar Flow Hood",
-    category: "equipment",
-    user: "E. Rodriguez",
-    status: "pending",
-    time: "08:45",
-  },
-  {
-    id: "TX-1038",
-    type: "restock",
-    item: "Agar Powder",
-    category: "chemical",
-    user: "L. Thompson",
-    quantity: "500g",
-    status: "completed",
-    time: "08:30",
-  },
-  {
-    id: "TX-1037",
-    type: "checkout",
-    item: "Spectrophotometer",
-    category: "equipment",
-    user: "Dr. Park",
-    status: "overdue",
-    time: "Yesterday",
-  },
-  {
-    id: "TX-1036",
-    type: "consume",
-    item: "MS Medium",
-    category: "chemical",
-    user: "Dr. Chen",
-    quantity: "50g",
-    status: "completed",
-    time: "Yesterday",
-  },
-];
+// mock transactions removed
 
 const typeConfig = {
   checkout: { label: "Out", color: "text-warning", bg: "bg-muted", border: "" },
@@ -110,13 +52,17 @@ const statusConfig = {
   overdue: { icon: AlertCircle, color: "text-destructive" },
 };
 
+import { useDashboardData } from "@/features/inventory/services/dashboardService";
+import { formatDistanceToNow } from "date-fns";
+
 const TransactionFeedCard = () => {
-  const pendingCount = transactions.filter(
-    (t) => t.status === "pending",
-  ).length;
-  const overdueCount = transactions.filter(
-    (t) => t.status === "overdue",
-  ).length;
+  const { data } = useDashboardData();
+  const transactions = data?.recent_transactions || [];
+  
+  // Note: the backend transactions API doesn't currently return status for all types, 
+  // so we won't count overdue/pending perfectly unless we parse borrow records.
+  const pendingCount = 0;
+  const overdueCount = 0;
 
   return (
     <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
@@ -145,12 +91,11 @@ const TransactionFeedCard = () => {
         </div>
       </div>
 
-      {/* Transaction List */}
       <div className="space-y-2">
         {transactions.map((tx, index) => {
-          const tConfig = typeConfig[tx.type];
-          const sConfig = statusConfig[tx.status];
-          const StatusIcon = sConfig.icon;
+          const tConfig = typeConfig[tx.action as keyof typeof typeConfig] || typeConfig.checkout;
+          const StatusIcon = statusConfig.completed.icon;
+          const timeAgo = tx.created_at ? formatDistanceToNow(new Date(tx.created_at), { addSuffix: true }) : "Unknown time";
 
           return (
             <div
@@ -160,11 +105,7 @@ const TransactionFeedCard = () => {
             >
               {/* Item Image */}
               <div className="w-10 h-10 shrink-0 overflow-hidden bg-muted flex items-center justify-center rounded-xl">
-                {tx.imageUrl ? (
-                  <TxImg src={tx.imageUrl} alt={tx.item} />
-                ) : (
-                  <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
-                )}
+                <ArrowLeftRight className="h-4 w-4 text-muted-foreground" />
               </div>
 
               {/* Type Badge */}
@@ -182,7 +123,7 @@ const TransactionFeedCard = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground truncate">
-                    {tx.item}
+                    {tx.item?.type} #{tx.item?.id}
                   </span>
                   {tx.quantity && (
                     <span className="text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded-xl">
@@ -192,11 +133,11 @@ const TransactionFeedCard = () => {
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-xs text-muted-foreground font-medium">
-                    {tx.user}
+                    {tx.user?.name || "System"}
                   </span>
                   <span className="text-xs text-muted-foreground">·</span>
                   <span className="text-xs text-muted-foreground font-medium">
-                    {tx.id}
+                    TX-{tx.id}
                   </span>
                 </div>
               </div>
@@ -204,13 +145,16 @@ const TransactionFeedCard = () => {
               {/* Time & Status */}
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-medium text-muted-foreground tabular-nums">
-                  {tx.time}
+                  {timeAgo}
                 </span>
-                <StatusIcon className={cn("h-3.5 w-3.5", sConfig.color)} />
+                <StatusIcon className={cn("h-3.5 w-3.5", statusConfig.completed.color)} />
               </div>
             </div>
           );
         })}
+        {transactions.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">No recent transactions</p>
+        )}
       </div>
     </div>
   );

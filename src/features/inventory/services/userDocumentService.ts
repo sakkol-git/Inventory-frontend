@@ -49,6 +49,9 @@ export const useUploadDocument = () => {
       if (payload.description) {
         formData.append("description", payload.description);
       }
+      if (payload.achievement_id) {
+        formData.append("achievement_id", String(payload.achievement_id));
+      }
       const { data } = await api.post<ApiResponse<UserDocument>>(
         "/user-documents",
         formData,
@@ -83,6 +86,9 @@ export const useUpdateUserDocument = () => {
         if (payload.description !== undefined && payload.description !== null) {
           formData.append("description", payload.description);
         }
+        if (payload.achievement_id !== undefined && payload.achievement_id !== null) {
+          formData.append("achievement_id", String(payload.achievement_id));
+        }
 
         const { data } = await api.post<ApiResponse<UserDocument>>(
           `/user-documents/${id}`,
@@ -98,6 +104,7 @@ export const useUpdateUserDocument = () => {
           title: payload.title,
           file_type: payload.file_type,
           description: payload.description,
+          achievement_id: payload.achievement_id,
         },
       );
       return data.data;

@@ -10,48 +10,7 @@ const ActivityImg = ({ src, alt, fallback: Fallback, className }: ActivityImgPro
   return <img src={src} alt={alt} className="w-full h-full object-cover" onError={() => setHasError(true)} />;
 };
 
-const activities = [
-  {
-    user: "Dr. Sarah Chen",
-    action: "added",
-    item: "Tomato Seedlings (Batch #127)",
-    quantity: 50,
-    time: "2 min ago",
-    type: "add",
-  },
-  {
-    user: "James Wilson",
-    action: "consumed",
-    item: "Ethanol 95%",
-    quantity: 500,
-    unit: "mL",
-    time: "15 min ago",
-    type: "consume",
-  },
-  {
-    user: "Emily Rodriguez",
-    action: "returned",
-    item: "Microscope (M-012)",
-    time: "1 hr ago",
-    type: "return",
-  },
-  {
-    user: "Dr. Michael Park",
-    action: "borrowed",
-    item: "pH Meter (PH-003)",
-    time: "2 hr ago",
-    type: "borrow",
-  },
-  {
-    user: "Lisa Thompson",
-    action: "consumed",
-    item: "Agar Powder",
-    quantity: 100,
-    unit: "g",
-    time: "3 hr ago",
-    type: "consume",
-  },
-];
+// mock fallback removed
 
 const getActionConfig = (type: string) => {
   switch (type) {
@@ -93,7 +52,13 @@ const getActionConfig = (type: string) => {
   }
 };
 
+import { useDashboardData } from "@/features/inventory/services/dashboardService";
+import { formatDistanceToNow } from "date-fns";
+
 const RecentActivityCard = () => {
+  const { data } = useDashboardData();
+  const activities = data?.recent_transactions || [];
+
   return (
     <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
       {/* Header */}
@@ -111,30 +76,21 @@ const RecentActivityCard = () => {
         </Button>
       </div>
 
-      {/* Activity List */}
       <div className="space-y-3">
         {activities.map((activity, index) => {
-          const config = getActionConfig(activity.type);
+          const config = getActionConfig(activity.action);
           const Icon = config.icon;
+          const timeAgo = activity.created_at ? formatDistanceToNow(new Date(activity.created_at), { addSuffix: true }) : "Unknown time";
 
           return (
             <div
-              key={index}
+              key={activity.id ?? index}
               className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/40 transition-all animate-fade-in"
               style={{ animationDelay: `${index * 60}ms` }}
             >
               {/* Item Image */}
               <div className="w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-muted flex items-center justify-center">
-                {activity.imageUrl ? (
-                  <ActivityImg
-                    src={activity.imageUrl}
-                    alt={activity.item}
-                    fallback={Icon}
-                    className={cn("h-5 w-5", config.iconColor)}
-                  />
-                ) : (
-                  <Icon className={cn("h-5 w-5", config.iconColor)} />
-                )}
+                <Icon className={cn("h-5 w-5", config.iconColor)} />
               </div>
 
               {/* Action Icon Badge */}
@@ -149,26 +105,28 @@ const RecentActivityCard = () => {
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground leading-relaxed">
-                  <span className="font-medium">{activity.user}</span>{" "}
+                  <span className="font-medium">{activity.user?.name || "System"}</span>{" "}
                   <span className="text-muted-foreground">
                     {activity.action}
                   </span>{" "}
-                  <span className="font-medium">{activity.item}</span>
+                  <span className="font-medium">{activity.item?.type} #{activity.item?.id}</span>
                   {activity.quantity && (
                     <span className="text-muted-foreground font-medium">
                       {" "}
-                      ({activity.quantity}
-                      {activity.unit || ""})
+                      ({activity.quantity})
                     </span>
                   )}
                 </p>
                 <p className="text-xs font-medium text-muted-foreground mt-1 tracking-wide">
-                  {activity.time}
+                  {timeAgo}
                 </p>
               </div>
             </div>
           );
         })}
+        {activities.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
+        )}
       </div>
     </div>
   );

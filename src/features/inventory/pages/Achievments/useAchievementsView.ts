@@ -6,8 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { handleFormError } from "@/lib/errors/handleFormError";
+import type { ViewMode } from "@/shared/components/ViewToggle";
+import type { Stat } from "@/shared/components/QuickStats";
 
 type AssignmentUserView = {
   id: number;
@@ -23,6 +26,7 @@ function getAssignedUserIds(achievement: Achievement | null): number[] {
 }
 
 export function useAchievementsView() {
+  const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<Achievement | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -31,8 +35,13 @@ export function useAchievementsView() {
   const [userSearch, setUserSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: response, isLoading, isError } = useAchievements({ page });
+  const queryParams: Record<string, unknown> = { page };
+  if (searchQuery) queryParams.search = searchQuery;
+
+  const { data: response, isLoading, isError } = useAchievements(queryParams);
   const achievements = response?.data ?? [];
   const meta = response?.meta;
   const assignmentQuery = useAchievementById(assignmentAchievementId ?? 0);
@@ -193,6 +202,18 @@ export function useAchievementsView() {
     }
   };
 
+  const navigateToDetail = (id: number) => navigate(`/inventory/achievements/${id}`);
+  const updateSearchQuery = (q: string) => setSearchQuery(q);
+  const switchViewMode = (mode: ViewMode) => setViewMode(mode);
+
+  const quickStats: Stat[] = [
+    {
+      label: "Total Achievements",
+      value: meta?.total ?? achievements.length,
+      color: "primary",
+    },
+  ];
+
   return {
     achievements,
     isLoading,
@@ -234,5 +255,11 @@ export function useAchievementsView() {
     confirmRevokeAchievement,
     meta,
     setPage,
+    viewMode,
+    switchViewMode,
+    searchQuery,
+    updateSearchQuery,
+    navigateToDetail,
+    quickStats,
   };
 }

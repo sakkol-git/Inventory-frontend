@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Pencil, Trash2, type LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactNode, memo } from "react";
 
 export interface ProductCardMeta {
   icon?: LucideIcon;
@@ -35,6 +35,12 @@ export interface ProductCardProps {
   className?: string;
   /** Background color for image area when no image */
   imageBackgroundColor?: string;
+  /** Custom actions to add to footer */
+  customActions?: {
+    label: string;
+    icon: ReactNode;
+    onClick: () => void;
+  }[];
 }
 
 /**
@@ -47,7 +53,7 @@ export interface ProductCardProps {
  * - Meta grid with icons
  * - Tags + optional edit button in footer
  */
-export const ProductCard = ({
+export const ProductCard = memo(({
   image,
   fallbackImage,
   title,
@@ -61,6 +67,7 @@ export const ProductCard = ({
   onClick,
   className,
   imageBackgroundColor = "bg-muted/30",
+  customActions = [],
 }: ProductCardProps) => {
   return (
     <div
@@ -160,6 +167,22 @@ export const ProductCard = ({
               </span>
             ))}
           </div>
+          {customActions.map((action, i) => (
+            <Button
+              key={i}
+              variant="ghost"
+              size="sm"
+              className="h-9 p-0 shrink-0 px-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                action.onClick();
+              }}
+              aria-label={action.label}
+              title={action.label}
+            >
+              {action.icon}
+            </Button>
+          ))}
           {onEdit && (
             <Button
               variant="ghost"
@@ -192,4 +215,6 @@ export const ProductCard = ({
       </div>
     </div>
   );
-};
+});
+
+ProductCard.displayName = "ProductCard";

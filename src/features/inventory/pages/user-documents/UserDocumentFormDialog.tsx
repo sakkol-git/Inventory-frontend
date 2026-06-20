@@ -1,5 +1,6 @@
 import { Paperclip } from "lucide-react";
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
+import { useAchievements } from "@/features/inventory/services/achievementService";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -60,6 +61,8 @@ const UserDocumentFormDialog = <TFieldValues extends FieldValues>({
   isPending,
 }: UserDocumentFormDialogProps<TFieldValues>) => {
   const fileRequired = mode === "create";
+  const { data: achievementsResponse } = useAchievements();
+  const achievements = achievementsResponse?.data || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -101,6 +104,31 @@ const UserDocumentFormDialog = <TFieldValues extends FieldValues>({
                       {FILE_TYPES.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={"achievement_id" as Path<TFieldValues>}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Achievement (Optional)</FormLabel>
+                  <Select value={field.value ? String(field.value) : undefined} onValueChange={(val) => field.onChange(Number(val))}>
+                    <FormControl>
+                      <SelectTrigger id={`${mode}-achievement-id`}>
+                        <SelectValue placeholder="Select achievement" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {achievements.map((achievement) => (
+                        <SelectItem key={achievement.id} value={String(achievement.id)}>
+                          {achievement.achievement_name}
                         </SelectItem>
                       ))}
                     </SelectContent>

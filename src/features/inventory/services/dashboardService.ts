@@ -68,7 +68,7 @@ function mapBackendDashboard(d: BackendDashboardResponse): DashboardData {
   return {
     plant_species_count: d.counts.plant_species ?? 0,
     plant_samples_count: d.counts.plant_samples ?? 0,
-    samples_by_status: {},
+    samples_by_status: d.status_breakdown?.samples_by_status ?? {},
     plant_stocks_count: d.counts.plant_stocks ?? 0,
     stocks_by_status: {},
     chemicals_count: d.counts.chemicals ?? 0,
