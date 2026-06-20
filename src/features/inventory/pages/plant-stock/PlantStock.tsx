@@ -5,7 +5,7 @@
  * This file is pure declarative JSX — no useState, no business logic.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
-import { Pencil, Plus, Sprout, Trash2, Warehouse } from "lucide-react";
+import { Pencil, Plus, Sprout, Trash2, Warehouse, MoreHorizontal, ArrowUpCircle, ArrowDownCircle, Bookmark, BookmarkMinus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProductCard } from "@/components/ui/ProductCard";
@@ -43,6 +51,7 @@ import { ServerPagination } from "@/shared/components/ServerPagination";
 import { QuickStats } from "@/shared/components/QuickStats";
 import SearchFilter from "@/shared/components/SearchFilter";
 import { ViewToggle } from "@/shared/components/ViewToggle";
+import { AdjustStockDialog } from "./AdjustStockDialog";
 
 import {
     formatEnumLabel,
@@ -104,6 +113,7 @@ const PlantStock = () => {
             onNavigate={view.navigateToDetail}
             onEdit={view.openEditForm}
             onDelete={view.requestDeleteStock}
+            onAdjust={view.openAdjustDialog}
           />
         )}
 
@@ -113,6 +123,7 @@ const PlantStock = () => {
             onNavigate={view.navigateToDetail}
             onEdit={view.openEditForm}
             onDelete={view.requestDeleteStock}
+            onAdjust={view.openAdjustDialog}
           />
         )}
 
@@ -120,6 +131,12 @@ const PlantStock = () => {
       </div>
 
       <StockFormDialog view={view} />
+      <AdjustStockDialog 
+        isOpen={view.adjustDialogOpen} 
+        onClose={view.closeAdjustDialog} 
+        action={view.adjustDialogAction} 
+        item={view.adjustDialogItem} 
+      />
 
       <ConfirmDialog
         open={view.deleteDialog.open}
@@ -171,12 +188,13 @@ interface StockListProps {
   onNavigate: (id: number) => void;
   onEdit: (b: StockItem) => void;
   onDelete?: (b: StockItem) => void;
+  onAdjust: (item: StockItem, action: any) => void;
 }
 
-const StockGrid = ({ items, onNavigate, onEdit, onDelete }: StockListProps) => (
+const StockGrid = ({ items, onNavigate, onEdit, onDelete, onAdjust }: StockListProps) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger-children">
     {items.map((b) => (
-      <StockCard key={b.id} item={b} onNavigate={onNavigate} onEdit={onEdit} onDelete={onDelete} />
+      <StockCard key={b.id} item={b} onNavigate={onNavigate} onEdit={onEdit} onDelete={onDelete} onAdjust={onAdjust} />
     ))}
   </div>
 );
@@ -186,37 +204,76 @@ const StockCard = ({
   onNavigate,
   onEdit,
   onDelete,
+  onAdjust,
 }: {
   item: StockItem;
   onNavigate: (id: number) => void;
   onEdit: (b: StockItem) => void;
   onDelete?: (b: StockItem) => void;
+  onAdjust: (item: StockItem, action: any) => void;
 }) => {
   const sampleName = item.relations.sample?.identity.name || "Unknown Variety";
   const scientificName = "";
 
+  const renderActions = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => onAdjust(item, "restock")} className="gap-2 cursor-pointer">
+          <ArrowUpCircle className="h-4 w-4 text-emerald-500" /> Restock
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onAdjust(item, "consume")} className="gap-2 cursor-pointer">
+          <ArrowDownCircle className="h-4 w-4 text-rose-500" /> Consume
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onAdjust(item, "reserve")} className="gap-2 cursor-pointer">
+          <Bookmark className="h-4 w-4 text-amber-500" /> Reserve
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onAdjust(item, "release")} className="gap-2 cursor-pointer">
+          <BookmarkMinus className="h-4 w-4 text-blue-500" /> Release
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => onEdit(item)} className="gap-2 cursor-pointer">
+          <Pencil className="h-4 w-4" /> Edit
+        </DropdownMenuItem>
+        {onDelete && (
+          <DropdownMenuItem onClick={() => onDelete(item)} className="text-destructive gap-2 cursor-pointer">
+            <Trash2 className="h-4 w-4" /> Delete
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
-    <ProductCard
-      fallbackImage={<Sprout className="h-20 w-20 text-muted-foreground/40" />}
-      title={sampleName}
-      subtitle={scientificName}
-      id={`#${item.id}`}
-      statusBadge={
-        <span className={statusStyle(item.inventory.status)}>
-          {formatEnumLabel(item.inventory.status)}
-        </span>
-      }
-      meta={[
-        { label: "Total:", value: item.inventory.total },
-        { label: "Reserved:", value: item.inventory.reserved },
-        { label: "Available:", value: item.inventory.net_available },
-      ]}
-      onClick={() => onNavigate(item.id)}
-      onEdit={() => onEdit(item)}
-      onDelete={onDelete ? () => onDelete(item) : undefined}
-      className="aspect-square"
-      imageBackgroundColor="bg-muted/30"
-    />
+    <div className="relative group">
+      <ProductCard
+        fallbackImage={<Sprout className="h-20 w-20 text-muted-foreground/40" />}
+        title={sampleName}
+        subtitle={scientificName}
+        id={`#${item.id}`}
+        statusBadge={
+          <span className={statusStyle(item.inventory.status)}>
+            {formatEnumLabel(item.inventory.status)}
+          </span>
+        }
+        meta={[
+          { label: "Total:", value: item.inventory.total },
+          { label: "Reserved:", value: item.inventory.reserved },
+          { label: "Available:", value: item.inventory.net_available },
+        ]}
+        onClick={() => onNavigate(item.id)}
+        className="aspect-square"
+        imageBackgroundColor="bg-muted/30"
+      />
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        {renderActions()}
+      </div>
+    </div>
   );
 };
 
@@ -227,6 +284,7 @@ const StockTable = ({
   onNavigate,
   onEdit,
   onDelete,
+  onAdjust,
 }: StockListProps) => (
   <div className="rounded-xl overflow-hidden border border-border/40">
     <Table>
@@ -277,30 +335,37 @@ const StockTable = ({
               </span>
             </TableCell>
             <TableCell className="text-right">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(b);
-                }}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-              {onDelete && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(b);
-                  }}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => onAdjust(b, "restock")} className="gap-2 cursor-pointer">
+                    <ArrowUpCircle className="h-4 w-4 text-emerald-500" /> Restock
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onAdjust(b, "consume")} className="gap-2 cursor-pointer">
+                    <ArrowDownCircle className="h-4 w-4 text-rose-500" /> Consume
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onAdjust(b, "reserve")} className="gap-2 cursor-pointer">
+                    <Bookmark className="h-4 w-4 text-amber-500" /> Reserve
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onAdjust(b, "release")} className="gap-2 cursor-pointer">
+                    <BookmarkMinus className="h-4 w-4 text-blue-500" /> Release
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onEdit(b)} className="gap-2 cursor-pointer">
+                    <Pencil className="h-4 w-4" /> Edit
+                  </DropdownMenuItem>
+                  {onDelete && (
+                    <DropdownMenuItem onClick={() => onDelete(b)} className="text-destructive gap-2 cursor-pointer">
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         ))}

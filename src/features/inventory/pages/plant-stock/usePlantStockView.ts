@@ -11,6 +11,7 @@ import {
     useDeletePlantStock,
     usePlantStockList,
     useUpdatePlantStock,
+    type AdjustStockAction,
 } from "@/features/inventory/services/plantStockService";
 import type {
     PlantStockApi,
@@ -117,6 +118,10 @@ export function usePlantStockView() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<StockItem | null>(null);
 
+  const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
+  const [adjustDialogItem, setAdjustDialogItem] = useState<StockItem | null>(null);
+  const [adjustDialogAction, setAdjustDialogAction] = useState<AdjustStockAction | null>(null);
+
   // ── Using new abstractions ──
   const form = useEntityForm({
     initialData: EMPTY_FORM,
@@ -217,6 +222,18 @@ export function usePlantStockView() {
     setFormOpen(true);
   };
 
+  const openAdjustDialog = (item: StockItem, action: AdjustStockAction) => {
+    setAdjustDialogItem(item);
+    setAdjustDialogAction(action);
+    setAdjustDialogOpen(true);
+  };
+
+  const closeAdjustDialog = () => {
+    setAdjustDialogOpen(false);
+    setAdjustDialogItem(null);
+    setAdjustDialogAction(null);
+  };
+
   // ── Delete Stock (with confirmation) ──
   const requestDeleteStock = (stock: StockItem) => {
     const sampleName =
@@ -266,5 +283,10 @@ export function usePlantStockView() {
     page,
     setPage,
     meta,
+    openAdjustDialog,
+    closeAdjustDialog,
+    adjustDialogOpen,
+    adjustDialogItem,
+    adjustDialogAction,
   };
 }

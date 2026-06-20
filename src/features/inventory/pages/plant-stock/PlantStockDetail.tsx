@@ -15,6 +15,7 @@ import { StockFormDialog } from "./StockFormDialog";
 import StockDetailRenderer from "./entity-detail/StockDetailRenderer";
 import { useStockDetail } from "./entity-detail/useStockDetail";
 import { usePlantStockView } from "./usePlantStockView";
+import { AdjustStockDialog } from "./AdjustStockDialog";
 
 const PlantStockDetailPage = () => {
   const detail = useStockDetail();
@@ -35,23 +36,40 @@ const PlantStockDetailPage = () => {
 
   const config = {
     ...detail.config,
-    actions: detail.config.actions.map((a) =>
-      a.label === "Edit"
-        ? {
+    actions: detail.config.actions.map((a) => {
+      if (a.label === "Edit") {
+        return {
             ...a,
             onClick: () =>
               stockView.openEditForm(
                 detail.rawData as Parameters<typeof stockView.openEditForm>[0],
               ),
-          }
-        : a,
-    ),
+        };
+      }
+      if (["Restock", "Consume", "Reserve", "Release"].includes(a.label)) {
+        return {
+          ...a,
+          onClick: () =>
+            stockView.openAdjustDialog(
+              detail.rawData as Parameters<typeof stockView.openAdjustDialog>[0],
+              a.label.toLowerCase() as any
+            ),
+        };
+      }
+      return a;
+    }),
   };
 
   return (
     <AppLayout>
       <StockDetailRenderer config={config} />
       <StockFormDialog view={stockView} />
+      <AdjustStockDialog
+        isOpen={stockView.adjustDialogOpen}
+        onClose={stockView.closeAdjustDialog}
+        action={stockView.adjustDialogAction}
+        item={stockView.adjustDialogItem}
+      />
     </AppLayout>
   );
 };
