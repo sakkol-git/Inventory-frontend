@@ -23,7 +23,7 @@ import type { Stat } from "@/shared/components/QuickStats";
 import type { ViewMode } from "@/shared/components/ViewToggle";
 import type { StockStatus } from "@/shared/types/enums";
 import { formatEnumLabel, STOCK_STATUSES } from "@/shared/types/enums";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -65,8 +65,9 @@ export { formatEnumLabel, STOCK_STATUSES };
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 function stockToForm(item: PlantStockApi): StockForm {
+  const sampleIdValue = item.plant_sample_id ?? item.relations?.sample?.id;
   return {
-    sampleId: item.plant_sample_id ? String(item.plant_sample_id) : "",
+    sampleId: sampleIdValue ? String(sampleIdValue) : "",
     quantity: String(item.inventory.total),
     reservedQuantity: String(item.inventory.reserved),
     status: item.inventory.status,
@@ -107,7 +108,19 @@ export function usePlantStockView() {
 
   // ── Samples for dropdown ──
   const { data: samplesResponse } = usePlantSampleList({ per_page: 100 });
-  const samples = samplesResponse?.data ?? [];
+  const fetchedSamples = samplesResponse?.data ?? [];
+
+  // Robustly ensure the currently edited stock's sample is always in the dropdown list
+  // even if it was excluded due to pagination.
+  const samples = useMemo(() => {
+    if (!editingItem?.relations?.sample) return fetchedSamples;
+    const editingSample = editingItem.relations.sample;
+    const exists = fetchedSamples.some((s) => s.id === editingSample.id);
+    if (!exists) {
+      return [...fetchedSamples, editingSample];
+    }
+    return fetchedSamples;
+  }, [fetchedSamples, editingItem]);
 
   // ── Mutations ──
   const createMutation = useCreatePlantStock();
@@ -216,9 +229,7 @@ export function usePlantStockView() {
   const openEditForm = (stock: StockItem) => {
     form.reset();
     setEditingItem(stock);
-    Object.entries(stockToForm(stock)).forEach(([key, value]) => {
-      form.updateField(key as keyof StockForm, value);
-    });
+    form.setFormData(stockToForm(stock));
     setFormOpen(true);
   };
 

@@ -39,6 +39,9 @@ export interface UseEntityFormResult<T> {
   /** Update a single form field */
   updateField: <K extends keyof T>(field: K, value: T[K]) => void;
 
+  /** Set the entire form data at once */
+  setFormData: (data: T) => void;
+
   /** Set error for a specific field */
   setFieldError: (field: keyof T, error: string) => void;
 
@@ -97,6 +100,10 @@ export function useEntityForm<T>(
     },
     [errors]
   );
+
+  const setFormData = useCallback((data: T) => {
+    setForm(data);
+  }, []);
 
   const setFieldError = useCallback((field: keyof T, error: string) => {
     setErrors((prev) => ({ ...prev, [field]: error }));
@@ -169,6 +176,7 @@ export function useEntityForm<T>(
     isSubmitting,
     isValid: Object.keys(errors).length === 0,
     updateField,
+    setFormData,
     setFieldError,
     clearFieldError,
     clearErrors,
