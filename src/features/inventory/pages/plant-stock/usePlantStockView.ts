@@ -110,17 +110,7 @@ export function usePlantStockView() {
   const { data: samplesResponse } = usePlantSampleList({ per_page: 100 });
   const fetchedSamples = samplesResponse?.data ?? [];
 
-  // Robustly ensure the currently edited stock's sample is always in the dropdown list
-  // even if it was excluded due to pagination.
-  const samples = useMemo(() => {
-    if (!editingItem?.relations?.sample) return fetchedSamples;
-    const editingSample = editingItem.relations.sample;
-    const exists = fetchedSamples.some((s) => s.id === editingSample.id);
-    if (!exists) {
-      return [...fetchedSamples, editingSample];
-    }
-    return fetchedSamples;
-  }, [fetchedSamples, editingItem]);
+
 
   // ── Mutations ──
   const createMutation = useCreatePlantStock();
@@ -134,6 +124,18 @@ export function usePlantStockView() {
   const [adjustDialogOpen, setAdjustDialogOpen] = useState(false);
   const [adjustDialogItem, setAdjustDialogItem] = useState<StockItem | null>(null);
   const [adjustDialogAction, setAdjustDialogAction] = useState<AdjustStockAction | null>(null);
+
+  // Robustly ensure the currently edited stock's sample is always in the dropdown list
+  // even if it was excluded due to pagination.
+  const samples = useMemo(() => {
+    if (!editingItem?.relations?.sample) return fetchedSamples;
+    const editingSample = editingItem.relations.sample;
+    const exists = fetchedSamples.some((s) => s.id === editingSample.id);
+    if (!exists) {
+      return [...fetchedSamples, editingSample];
+    }
+    return fetchedSamples;
+  }, [fetchedSamples, editingItem]);
 
   // ── Using new abstractions ──
   const form = useEntityForm({
