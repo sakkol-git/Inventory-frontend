@@ -31,6 +31,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/core/api/api";
 import { cn } from "@/shared/lib/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -133,6 +134,7 @@ function formatRelativeTime(dateStr: string): string {
 export function NotificationPanel() {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   // Unread count — lightweight poll every 60s
   const { data: unreadCount = 0 } = useQuery({
@@ -308,7 +310,13 @@ export function NotificationPanel() {
         {/* Footer */}
         {notifications.length > 0 && (
           <div className="border-t px-4 py-2">
-            <button className="w-full text-center text-xs text-primary hover:underline py-1">
+            <button 
+              className="w-full text-center text-xs text-primary hover:underline py-1"
+              onClick={() => {
+                setOpen(false);
+                navigate("/inventory/notifications");
+              }}
+            >
               View all notifications
             </button>
           </div>

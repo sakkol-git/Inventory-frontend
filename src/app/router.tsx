@@ -114,6 +114,10 @@ const UserProfile = lazyRoute(
   () => import("@/features/inventory/pages/user-profile/UserProfile"),
   { displayName: "UserProfile" },
 );
+const Notifications = lazyRoute(
+  () => import("@/features/inventory/pages/notifications/Notifications"),
+  { displayName: "Notifications" },
+);
 
 // ─── Inventory: Details ──────────────────────────────────────────────────────
 const PlantSpeciesDetail = lazyRoute(
@@ -331,6 +335,14 @@ export default function AppRoutes() {
         element={
           <Protected>
             <UserProfile />
+          </Protected>
+        }
+      />
+      <Route
+        path="/inventory/notifications"
+        element={
+          <Protected>
+            <Notifications />
           </Protected>
         }
       />
