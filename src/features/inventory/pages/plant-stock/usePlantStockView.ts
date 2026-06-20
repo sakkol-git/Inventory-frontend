@@ -66,7 +66,7 @@ export { formatEnumLabel, STOCK_STATUSES };
 
 function stockToForm(item: PlantStockApi): StockForm {
   return {
-    sampleId: item.relations.sample ? String(item.relations.sample.id) : "",
+    sampleId: item.plant_sample_id ? String(item.plant_sample_id) : "",
     quantity: String(item.inventory.total),
     reservedQuantity: String(item.inventory.reserved),
     status: item.inventory.status,

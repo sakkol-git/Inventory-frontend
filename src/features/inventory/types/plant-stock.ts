@@ -7,6 +7,7 @@ import type { PlantSampleApi } from "./plant-sample";
 
 export interface PlantStockApi {
   id: number;
+  plant_sample_id: number | null;
   inventory: {
     total: number;
     reserved: number;
