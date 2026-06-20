@@ -198,7 +198,8 @@ const INVENTORY_GROUPS: NavGroup[] = [
     items: INVENTORY_NAV.filter((n) =>
       [
         "Borrow Records",
-        "Chemical Usage",
+        // "Chemical Batches",
+        // "Maintenance",
       ].includes(n.title),
     ),
   },
@@ -216,6 +217,7 @@ const INVENTORY_GROUPS: NavGroup[] = [
         "Roles",
         "Permissions",
         "Activity Log",
+        "Chemical Usage Logs",
         "Transactions",
         "My Profile",
       ].includes(n.title),
