@@ -7,22 +7,22 @@
 import { useAuth } from "@/core/auth/useAuth";
 import type { LucideIcon } from "lucide-react";
 import {
-    ArrowLeftRight,
-    Award,
-    BarChart3,
-    Beaker,
-    Boxes,
-    ClipboardList,
-    FileText,
-    FlaskConical,
-    Key,
-    LayoutDashboard,
-    Leaf,
-    Shield,
-    Sprout,
-    User,
-    Users,
-    Wrench,
+  ArrowLeftRight,
+  Award,
+  BarChart3,
+  Beaker,
+  Boxes,
+  ClipboardList,
+  FileText,
+  FlaskConical,
+  Key,
+  LayoutDashboard,
+  Leaf,
+  Shield,
+  Sprout,
+  User,
+  Users,
+  Wrench,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -197,10 +197,8 @@ const INVENTORY_GROUPS: NavGroup[] = [
     label: "Operations",
     items: INVENTORY_NAV.filter((n) =>
       [
-        "Transactions",
         "Borrow Records",
-       // "Chemical Batches",
-        // "Maintenance",
+        "Chemical Usage",
       ].includes(n.title),
     ),
   },
@@ -218,7 +216,6 @@ const INVENTORY_GROUPS: NavGroup[] = [
         "Roles",
         "Permissions",
         "Activity Log",
-        "Chemical Usage Logs",
         "Transactions",
         "My Profile",
       ].includes(n.title),
